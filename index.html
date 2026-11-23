@@ -888,6 +888,10 @@ html.mcap{background:var(--paper)}
         <div class="tdmg"><div class="kv" id="tdMoney"></div><div class="tdside" id="tdSide"></div></div>
       </div>
     </div>
+    <div class="card" id="sec-td-dot">   <!-- v1.7.323 -->
+      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca · mọi đợt, không theo bộ lọc · giống hệt ở tab Hôm nay và Doanh thu thuần</span></div>
+      <div class="tblwrap" style="max-height:320px" data-dottm></div>
+    </div>
     <div class="g311">
       <div class="card">
         <div class="ct">Nhịp bán cộng dồn <span class="nt">· số ly lũy kế theo 15 phút · nét đứt = cùng thứ tuần trước · đường mờ = hôm qua</span></div>
@@ -997,6 +1001,10 @@ html.mcap{background:var(--paper)}
       <div class="cw"><canvas id="cDtt" aria-label="Doanh thu thực thu theo ngày, tiền mặt và chuyển khoản"></canvas></div>
       <div class="legend" id="lgDtt"></div>
       <div class="cmt" id="dttCmt"></div>
+    </div>
+    <div class="card" id="sec-dtt-dot">   <!-- v1.7.323 -->
+      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca · mọi đợt, không theo bộ lọc · giống hệt ở tab Hôm nay và Doanh thu thuần</span></div>
+      <div class="tblwrap" style="max-height:320px" data-dottm></div>
     </div>
     <div class="card" id="sec-dtt-bang">
       <div class="ct">Bảng doanh thu hằng ngày <span class="nt">· cùng số với tab Doanh thu của Sheet</span></div>
@@ -2951,6 +2959,7 @@ function renderTdKy(){
   $('tdChot').innerHTML = K.ket.length ? `🔒 Đã chốt <b>${daChot.length}/${K.ket.length}</b> ngày bán · tổng lệch két ${lech === 0 ? '<b class="up">khớp</b>' : lech > 0 ? `<b>dư ${fmt(lech)} đ</b>` : `<b class="dn">thiếu ${fmt(-lech)} đ</b>`}${chuaChot.length ? ` · <b class="dn">chưa chốt: ${chuaChot.map(x => dShort(x.k)).join(', ')}</b>` : ''}` : 'Kỳ này chưa có ngày bán.';
 }
 function renderToday(){
+  veDotTienMat();   // v1.7.323: trước nhánh Tuần/Tháng để bảng có ở mọi kỳ xem
   if (S.tdKy !== 'ngay') return renderTdKy();
   tdThanh();
   datCt('tdMoney', 'Tiền & lãi hôm nay', '· két phải có = tiền mặt − chi từ két · lãi như tab PNL');
@@ -3880,7 +3889,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.322';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.323';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3938,6 +3947,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.323', ngay:'23/11/2026', nd:['Doanh thu thuần + Hôm nay: thêm bảng 💵 Tiền mặt theo đợt làm việc (mỗi đợt = các ngày bán liên tiếp của cùng người làm ca, vd Quỳnh Nga 20–23/11) — hai tab cùng một bảng, số lấy từ chốt ca như bảng doanh thu hằng ngày']},
   {v:'v1.7.322', ngay:'22/11/2026', nd:['Tài liệu: tạm gỡ Menu cầm tay bản clean (khối Trà demo chưa đạt, chủ nghiên cứu thêm); bản 2 và menu đang dùng có icon vẫn giữ']},
   {v:'v1.7.321', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean bỏ chữ phụ cạnh tiêu đề nhóm; 3 ly trà demo làm lại từ ly cà phê sữa máy (nước trong, có đá) theo ảnh mẫu — mãng cầu trắng kem, măng cụt tím, lựu đỏ']},
   {v:'v1.7.320', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean — 3 ly trà demo chỉnh màu theo ảnh mẫu (mãng cầu hổ phách, măng cụt vàng cam, lựu đỏ), thêm hình trái cây mãng cầu / măng cụt / lựu ở góc dưới ly']},
@@ -3949,27 +3959,6 @@ const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều 
   {v:'v1.7.314', ngay:'22/11/2026', nd:['Tài liệu: 2 bản menu cầm tay ảnh từng món thêm icon máy / phin ở dòng giá cà phê đen, cà phê sữa cho dễ phân biệt (bản clean chỉ để icon)']},
   {v:'v1.7.313', ngay:'22/11/2026', nd:['Tài liệu: thêm Menu cầm tay bản clean (nền kem nhạt, ly nhỏ xếp thoáng, giá chữ trơn, 3 hàng) · sửa vết xoá chữ dưới logo trên ảnh ly matcha latte muối và phindi hạt phỉ (lộ dải mờ hình chữ nhật)']},
   {v:'v1.7.312', ngay:'22/11/2026', nd:['Tài liệu: Menu cầm tay ảnh từng món bản 2 — toàn nền kem, mọi ly cùng cỡ, 2 cột (Cà phê + Matcha & trà sữa │ Cacao + Phindi + logo, địa chỉ)']},
-  {v:'v1.7.311', ngay:'22/11/2026', nd:['Tài liệu: thêm Menu cầm tay ảnh từng món (bản nháp) — 4 khối như menu đang dùng, mỗi món một ảnh ly và nút giá M │ L như standee vòm; PDF in A3 để ở máy (pdf-in), dashboard giữ ảnh xem trước']},
-  {v:'v1.7.310', ngay:'22/11/2026', nd:['Tài liệu: thêm Sticker tròn mua 3 free upsize 1 (Ø 10 cm, cùng kiểu mua 5 tặng 1) — ảnh PNG 300 dpi và PDF in A4 4 cái, chữ đã chuyển thành hình']},
-  {v:'v1.7.309', ngay:'20/11/2026', nd:['Tài liệu: PDF in thiệp đơn mang đi sửa lỗi lệch bố cục (chữ tràn ra ngoài) và đổi sang bản chữ đã chuyển thành hình (0 font)']},
-  {v:'v1.7.308', ngay:'20/11/2026', nd:['Tài liệu: PDF in thẻ thành viên đổi sang bản chữ đã chuyển thành hình (0 font), nhà in không cần cài Courier New']},
-  {v:'v1.7.307', ngay:'20/11/2026', nd:['Tài liệu: thêm Thiệp kèm đơn mang đi (90 × 54 mm in 2 mặt) — cảm ơn khách, đơn sai sót thì quét QR Zalo báo Kai, Kai Café hỗ trợ bồi hoàn nếu sai sót nghiêm trọng; có PDF in và ảnh từng mặt.']},
-  {v:'v1.7.306', ngay:'20/11/2026', nd:['Tài liệu: thẻ thành viên mặt sau thêm mã QR Zalo Kai (cùng mã trên ly và thiệp cảm ơn), ô −2K / LY thu nhỏ đứng cạnh tiêu đề']},
-  {v:'v1.7.305', ngay:'20/11/2026', nd:['Tài liệu: thẻ thành viên bản dùng làm lại theo kiểu thiệp cảm ơn — bỏ dòng "T7, CN đồng giá: không áp dụng" (thẻ áp dụng mọi ngày từ 21/11), nhấn mạnh "Giữ lại thẻ để sử dụng nhiều lần", chân thẻ ghi Mở cửa từ 5:30 + SĐT; bỏ hẳn bản sang (dự phòng)']},
-  {v:'v1.7.304', ngay:'20/11/2026', nd:['Sổ chi tách hạng mục (chủ chốt 20/11): Đường · Trà · Thạch & topping (từ Sữa, đường & nguyên liệu pha) · Ly & nắp · Túi & bịch · Bao bì khác (từ Ly, nắp, ống hút, túi, hộp, dụng cụ); dòng cũ T10–T11 đã chuyển, tab Kho cột Hạng mục đổi theo, bot /note tự đoán mục mới (tachhm-v1 @289). Vẫn là Giá vốn nên lãi không đổi.', 'Nhắc "chưa có giá đường cát" giờ hướng dẫn ghi hạng mục Đường.']},
-  {v:'v1.7.303', ngay:'20/11/2026', nd:['Tài khoản nhân viên: bảng ca ở Nhân sự không còn hiện cột Thực nhận và số tiền chuyên cần / dậy sớm / ca 1 người của từng người (chỉ còn số lần); bỏ cảnh báo "% lương thấp hơn thật".', 'Tổng quan · Tổng hợp theo tháng: nhân viên không thấy cột Tiền cuối tháng (số này cần sổ chi, nhân viên không có nên ra sai). Cột CK thực nhận lúc chốt ca vẫn giữ.']},
-  {v:'v1.7.302', ngay:'20/11/2026', nd:['Đối chiếu Sheet 20/11: doanh thu, giá vốn + cho kèm, nhân sự, vận hành, lãi hoạt động, dòng tiền, quỹ (TM 300.000 · CK 1.025.382), công nợ T10–T11 khớp từng đồng; lương khớp BangLuong (bảng giờ công lệch 1 đ do bot làm tròn từng ca); tồn kho 20/20 mặt hàng khớp Bảng kho. PNL kỳ tháng lệch Thu chi đúng bằng khối đối chiếu (lệch két + phí cả tháng giãn theo ngày).', 'Thu hồi vốn: dự kiến hơn 3 năm thì ghi "chưa ước được" kèm lãi TB 14 ngày, không còn ra ngày vô lý (trước: ~18/03/2953).']},
-  {v:'v1.7.301', ngay:'19/11/2026', nd:['Kỳ xem: đổi từ tháng đầu (T10) sang Ngày / Tuần không còn nhảy về trước ngày bán đầu tiên (trước ra tuần 28/09–04/10 trống) — mốc tự kéo về ngày bán đầu.']},
-  {v:'v1.7.300', ngay:'19/11/2026', nd:['Thanh lọc: thêm drop list Tháng (cạnh Kỳ xem) — chọn tháng nào thì Kỳ xem = cả tháng đó, mọi thẻ / tab có lọc cùng theo; đang xem ngày / tuần / khoảng thì hiện "— chọn tháng —".', 'Lịch làm theo đợt: Lọc tháng đổi từ hàng nút sang drop list (Từ hôm nay / từng tháng có lịch), cùng kiểu Ai làm ngày nào.']},
-  {v:'v1.7.299', ngay:'19/11/2026', nd:['Bộ lọc đồng bộ: tab Nhân sự dùng chung 1 người và 1 tháng. Chọn người ở Ai làm ngày nào / Lịch làm theo đợt = chọn Nhân viên ở thanh lọc (mọi thẻ, mọi tab cùng lọc; bỏ bằng ✕ ở chip). Chọn tháng đã qua / tháng này = đổi Kỳ xem; tháng sau chỉ áp 2 thẻ lịch, đổi Kỳ xem là bỏ.', 'Thanh lọc Nhân viên → Ai làm ngày nào và Lịch làm theo đợt cũng lọc theo; Kỳ xem tháng nào thì Ai làm ngày nào hiện tháng đó.', 'Thu chi · Kết quả tháng: mặc định tháng của Kỳ xem (trước nhảy tới 01/2027 vì khoản cố định tạm tính); đổi tháng ở Kết quả tháng hay bảng Chi thì ô kia theo cùng.']},
-  {v:'v1.7.298', ngay:'19/11/2026', nd:['Kai\'s facts: mọi kỷ lục bán hàng (ly / giờ, ca kỷ lục, AOV, size L, thẻ thành viên, món tủ, đơn to nhất, giờ cháy nhất, ghi nhiều đơn, xanh nhất, đơn app, chuyên gia nhóm món; ngày kỷ lục, món số 1, khung giờ đông nhất) chỉ tính ngày giá thường — bỏ 10–16/10 đồng giá 10K và ngày đồng giá 15K (chủ nhờ 19/11). Gắn bó, thâm niên, đúng giờ, chốt két, kiểm kho, tổng ly vẫn tính từ ngày mở.']},
-  {v:'v1.7.297', ngay:'19/11/2026', nd:['Sửa v1.7.296: cột Sinh nhật (Hồ sơ nhân viên) giờ hiện đúng dd/mm/yyyy — bản trước lỗi biểu thức kiểm ngày nên vẫn hiện chuỗi thô.']},
-  {v:'v1.7.296', ngay:'19/11/2026', nd:['Kiểm toàn diện (logic · giao diện · trình bày): Tự kiểm 97/97, không lỗi JS ở 20 tab, không cuộn ngang ở cỡ điện thoại.', 'Nhân sự · Hồ sơ nhân viên: cột Sinh nhật hiện dd/mm/yyyy (trước hiện chuỗi thô D:2006-08-25 00:00:00).', 'Nhân sự · Ai làm ngày nào: ô ca đã xếp (nét đứt) chữ theo màu chủ đề — chế độ tối đọc được.', 'Nút ＋ mở chi tiết trong bảng to hơn trên điện thoại (16 → 28 px).']},
-  {v:'v1.7.295', ngay:'19/11/2026', nd:['Tab Nhân sự · Ai làm ngày nào: chọn được cả tháng có lịch sắp tới (vd T12); ngày chưa tới (và hôm nay chưa chấm công) hiện ca đã xếp trong DangKyCa, khung nét đứt, chưa tính vào ngày / giờ / tiền công; ngày nghỉ bán ghi "nghỉ bán".', 'Thêm ô chọn Người (Mọi người / từng nhân viên) → lưới, vắng và bảng tổng chỉ người đó; bảng thêm cột Ca đã xếp sắp tới.']},
-  {v:'v1.7.294', ngay:'19/11/2026', nd:['Lịch làm theo đợt: thêm nút Lọc người (Mọi người / từng nhân viên) và Lọc tháng (Từ hôm nay / từng tháng có lịch). Chọn tháng → lưới hiện cả tháng đó (ngày đã qua vẫn lấy chấm công ✓ ✗), các đợt + bảng ngày / giờ tính theo tháng (chuỗi chuyên cần dự kiến vẫn nối từ hôm nay); chọn người → chỉ hiện ô của người đó. Cùng bot lichthang-v1 @288: /lichca thang 12 trong group, chủ nhắn riêng /lichca thang 12 group → gửi lịch tháng vào group']},
-  {v:'v1.7.293', ngay:'16/11/2026', nd:['Lương / chấm công: chủ duyệt OT riêng 1 ca bằng ghi chú ChamCong cột I "duyệt OT … N p" → ca đó tính cả vào sớm lẫn về muộn, tối đa N phút (chỉ nâng trần, không cộng thêm). Lần đầu: Bảo Duy 16/11 tối đa 60p (05:24→11:55: OT 60p, bỏ 31p). Cùng bot otduyet-v1 @278; bất biến 85 thêm ca mẫu này']},
-  {v:'v1.7.292', ngay:'16/11/2026', nd:['Tab Hôm nay (xem 1 ngày): khối 🎁 Ưu đãi đã bán thôi lặp bảng theo ngày của tab Bán hàng (chỉ ra 1 dòng) — 1 dòng "ưu đãi đã giảm" so hôm qua / cùng thứ tuần trước tới cùng giờ + bảng từng loại (thẻ TV, mang ly, tặng, upsize, giá Kai / Lẩu, size lớn): ly, % số ly, đơn, tiền giảm, so hôm qua và tuần trước.', 'Xem tuần / tháng ở tab Hôm nay và tab Bán hàng giữ nguyên.']},
-  {v:'v1.7.291', ngay:'16/11/2026', nd:['Tab Hôm nay: thẻ Thành viên & mang ly đổi thành "🎁 Ưu đãi đã bán" — dòng tóm tắt + bảng theo ngày y chang tab Bán hàng (dùng chung 1 hàm, theo kỳ đang xem); biểu đồ đếm ly thành viên gộp N ly = N ly.', 'Dòng tổng đổi tên "Tổng quán nhường" → "Ưu đãi đã giảm" (bot cùng chữ).']},
 ];
 /** Còn treo: nhóm · việc (chuỗi hoặc hàm) · cần gì / từ ai · xong() tự kiểm theo dữ liệu (không có thì chỉ xoá tay khỏi danh sách này khi đã giải quyết) · tt() chữ trạng thái */
 const BACKLOG = [
@@ -4384,6 +4373,13 @@ function tuKiem(){
     ok('Doanh thu thuần: đọc tab Doanh thu theo tên cột — ghi chú 12/10 "Thiếu két" (ô trống bỏ qua), mục tiêu T10 23.760.000 · T11 38.400.000 (dòng TỔNG bỏ qua); không có dòng tiêu đề → rỗng',
       dsO.note['2026-10-12'] === 'Thiếu két' && !('2026-10-13' in dsO.note) && dsO.mucTieu['2026-10'] === 23760000 && dsO.mucTieu['2026-11'] === 38400000 && Object.keys(dsO.mucTieu).length === 2 && !Object.keys(dsN.note).length,
       `${Object.keys(dsO.note).length} ghi chú · ${Object.keys(dsO.mucTieu).join(', ')}`);
+    // 98. Tiền mặt theo đợt làm việc (v1.7.323)
+    { const nd = (k, tm, chot = true) => ({k, tt:tm + 50, bot:tm + 50, tm, chot}), NTd = {}; [nd('2026-11-14', 170), nd('2026-11-15', 145), nd('2026-11-17', 244), nd('2026-11-18', 99, false), nd('2026-11-20', 283), nd('2026-11-21', 60), {k:'2026-11-22', tt:0, bot:0, tm:0, chot:false}].forEach(d => { NTd[d.k] = d; });
+      const cg = [['2026-11-14', 'Nga'], ['2026-11-15', 'Duy'], ['2026-11-15', 'Chủ'], ['2026-11-17', 'Duy'], ['2026-11-18', 'Duy'], ['2026-11-20', 'Chủ'], ['2026-11-21', 'Nga'], ['2026-11-21', 'Duy']].map(([k, nv]) => ({k, nv}));
+      const dm = dotTienMatCore(NTd, cg, [{k:'2026-11-15', nv:'Chủ'}, {k:'2026-11-20', nv:'Nga'}], n => n === 'Chủ'), dmTxt = dm.map(x => `${x.nv} ${x.tu.slice(8)}-${x.den.slice(8)} ${x.tm}/${x.n}`).join(' | ');
+      const thuc = dotTienMatCore(nguonTien(), D.cong, D.chot, laChu).reduce((a, x) => a + x.tm, 0), goc = Object.values(nguonTien()).reduce((a, d) => a + (d.chot && (d.tt || d.bot) ? d.tm : 0), 0);
+      ok('Tiền mặt theo đợt làm việc: Duy 15–18/11 gộp 1 đợt (nghỉ bán 16/11 không cắt, 18/11 chưa chốt không cộng, chủ chấm công / chốt hộ không tính), 20/11 không nhân viên chấm công → người chốt, 21/11 hai người → "Duy + Nga"; tổng mọi đợt = tổng tiền mặt các ngày đã chốt',
+        dmTxt === 'Nga 14-14 170/1 | Duy 15-18 389/3 | Nga 20-20 283/1 | Duy + Nga 21-21 60/1' && dm[1].chua.join() === '2026-11-18' && thuc === goc, `${dmTxt} · tổng ${fmt(thuc)} / ${fmt(goc)}`); }
     // 43. Lịch định lượng cacao theo ngày (mốc mới đứng trước) + đọc tab GoTatHoc theo tên cột
     const dlC = {cc:4.9, ly:1}, dlA = ['2026-10-12', '2026-10-13', '2026-10-15', '2026-10-16'].map(k => ctTheoNgay(dlC, DINH_LUONG_CU, k).cc), gtH = docGoTatHoc([['Cụm gõ', 'Mã món', 'Tên món', 'Học lúc', 'Số lần'], ['den da', 'CDM', 'Cà phê đen máy', '', 3], ['den nong', 'cdm', 'Cà phê đen máy', '', 3], ['', 'bx', '', '', '']]);
     ok('Cacao: ly bán 12/10 tính 10 g · 13/10 và 15/10 tính 7 g · 16/10 tính theo CongThuc (thử với số giả 4,9 g); tab GoTatHoc: 2 cụm của cdm (mã viết hoa vẫn nhận), dòng thiếu cụm bỏ qua, không có tab → rỗng',
@@ -5963,7 +5959,32 @@ function docDtSheet(rv){
   });
   return out;
 }
+/** v1.7.323 (chủ nhờ 23/11) — tiền mặt theo ĐỢT LÀM VIỆC: các ngày bán liên tiếp cùng người làm ca gộp 1 đợt (ngày nghỉ bán ở giữa không cắt đợt).
+ *  Người làm ca = nhân viên có chấm công ngày đó (không tính chủ); không ai chấm công thì người chốt ca, rồi tới chủ. Nhiều nhân viên cùng ngày → "A + B".
+ *  Tiền mặt = nguonTien().tm của ngày ĐÃ chốt ca (cùng số bảng doanh thu hằng ngày và tab Doanh thu của Sheet); ngày chưa chốt không cộng, liệt kê riêng. Hàm thuần (bất biến 98). */
+function dotTienMatCore(NT, cong, chot, laChuFn){
+  const nvCa = {}, moi = {}, nguoiChot = {};
+  cong.forEach(c => { const o = laChuFn(c.nv) ? moi : nvCa; (o[c.k] = o[c.k] || new Set()).add(c.nv); });
+  chot.forEach(c => { nguoiChot[c.k] = c.nv; });
+  const ai = k => nvCa[k] ? [...nvCa[k]].sort((a, b) => a.localeCompare(b, 'vi')).join(' + ') : nguoiChot[k] || (moi[k] ? [...moi[k]][0] : 'Chưa rõ');
+  const out = [];
+  Object.values(NT).filter(d => d.tt || d.bot).sort((a, b) => a.k.localeCompare(b.k)).forEach(d => {
+    const nv = ai(d.k); let x = out[out.length - 1];
+    if (!x || x.nv !== nv) out.push(x = {nv, tu:d.k, den:d.k, n:0, tm:0, ngay:[], chua:[]});
+    x.den = d.k; x.n++;
+    if (d.chot){ x.tm += d.tm; x.ngay.push({k:d.k, tm:d.tm}); } else x.chua.push(d.k);
+  });
+  return out;
+}
+/** Vẽ CÙNG một bảng vào mọi ô [data-dottm] (tab Hôm nay và Doanh thu thuần) → hai nơi luôn giống nhau */
+function veDotTienMat(){
+  const ds = dotTienMatCore(nguonTien(), D.cong, D.chot, laChu).reverse(), T = ds.reduce((a, x) => { a.tm += x.tm; a.n += x.n; return a; }, {tm:0, n:0});
+  const kh = x => x.tu === x.den ? dShort(x.tu) : x.tu.slice(0, 7) === x.den.slice(0, 7) ? `${x.tu.slice(8)}–${dShort(x.den)}` : `${dShort(x.tu)}–${dShort(x.den)}`;
+  const html = `<table><thead><tr><th>Đợt</th><th>Người làm ca</th><th class="r">Ngày bán</th><th class="r">Tiền mặt</th><th>Từng ngày</th></tr></thead><tbody>${ds.length ? ds.map(x => `<tr><td style="white-space:nowrap">${kh(x)}</td><td><b>${esc(x.nv)}</b></td><td class="r num">${x.n}</td><td class="r num"><b>${fmt(x.tm)}</b></td><td class="muted" style="font-size:11.5px">${x.ngay.map(d => `${dShort(d.k)}: ${fmt(d.tm)}`).join(' · ')}${x.chua.length ? ` <span class="pill warn">chưa chốt ${x.chua.map(dShort).join(', ')}</span>` : ''}</td></tr>`).join('') : '<tr><td colspan="5" class="muted" style="text-align:center;padding:14px">Chưa có ngày bán.</td></tr>'}</tbody>${ds.length ? `<tfoot><tr><td>Tổng</td><td></td><td class="r num">${T.n}</td><td class="r num">${fmt(T.tm)}</td><td></td></tr></tfoot>` : ''}</table>`;
+  document.querySelectorAll('[data-dottm]').forEach(el => { el.innerHTML = html; });
+}
 function renderDtt(){
+  veDotTienMat();
   const NT = nguonTien(), SH = D.dtSheet || {note:{}, mucTieu:{}}, s1 = css('--s1'), s2 = css('--s2'), ghost = css('--ghost');
   const lyNgay = {}; D.orders.forEach(o => { lyNgay[o.k] = (lyNgay[o.k] || 0) + o.sl; });
   const days = rangeDays(S.from, S.to).filter(k => dayOk(k) && NT[k] && (NT[k].tt || NT[k].bot));
