@@ -2850,6 +2850,8 @@ const chipDongGia = l => { const o = l[0]; if (!o || laApp(o) || l.some(x => x.d
 const chipDonRieng = l => { const d = (l.find(x => x.dtg) || {}).dtg, u = l.filter(x => x.up).reduce((a, x) => a + x.sl, 0);
   return (d === 'kai' ? ' <span class="pill neu" title="Đơn giá Nhân viên Kai 10.000 đ/món (bot gõ kai)">☕ Kai 10K</span>' : d === 'lau' ? ' <span class="pill neu" title="Đơn giá Nhà hàng lẩu 15.000 đ/món (bot gõ lau)">🍲 Lẩu 15K</span>' : '')
     + (u ? ` <span class="pill good" title="Mua 3 free upsize: ${u} ly làm size L, tính giá size nhỏ">🆙 free upsize</span>` : ''); };
+/* v1.7.351 (chủ 23/11): chip đơn đúng 2 ly (cộng số ly cả đơn, ly gộp = 1 ly); đơn 3 / 5 ly đã có chip free upsize / tặng */
+const chipDon2 = l => l.reduce((a, x) => a + x.sl, 0) === 2 ? ' <span class="pill neu" title="Đơn 2 ly">👥 đơn 2</span>' : '';
 /* v1.7.202: chip cỡ ly ở Đơn mới nhất / Đơn trong kỳ — hệ số DonHang cột M: 1 < hs < 2 = size L (1,3) · hs nguyên ≥ 2 = ly gộp (+N) */
 const chipLy = o => { const hs = o.hs || 1; if (!(hs > 1)) return ''; if (hs >= 2 && Number.isInteger(hs)) return ` <span class="pill neu" title="Ly gộp hệ số ${hs}">gộp ${hs}</span>`;
   /* v1.7.211: chip L kèm phụ thu thật so với giá M ở Menu (cộng lại −2K thẻ thành viên; đơn app không so) → L +5K chuẩn, L +2K / +3K là bán lệch */
@@ -3000,7 +3002,7 @@ function renderTdKy(){
   /* đơn trong kỳ */
   datCt('tdFeed', 'Đơn trong kỳ');
   const ord = [...groupBy(K.L, o => o.id)].map(([id, l]) => ({id, k:l[0].k, t:l[0].t, min:l[0].min, nv:l[0].nv, pt:l[0].pt, tt:l.reduce((x, o) => x + o.tt, 0), ly:l.reduce((x, o) => x + o.sl, 0),
-    it:l.map(o => esc(`${o.sl}× ${o.mon.replace('Cà phê', 'CF')}`) + chipLy(o)).join(', '), anh:l.map(o => o.ma), tv:l.some(o => o.tv), ml:l.some(o => o.ml), tang:l.some(o => o.tang), dg:chipDongGia(l) + chipDonRieng(l)})).sort((a, b) => a.k === b.k ? (b.min ?? 0) - (a.min ?? 0) : a.k < b.k ? 1 : -1);
+    it:l.map(o => esc(`${o.sl}× ${o.mon.replace('Cà phê', 'CF')}`) + chipLy(o)).join(', '), anh:l.map(o => o.ma), tv:l.some(o => o.tv), ml:l.some(o => o.ml), tang:l.some(o => o.tang), dg:chipDon2(l) + chipDongGia(l) + chipDonRieng(l)})).sort((a, b) => a.k === b.k ? (b.min ?? 0) - (a.min ?? 0) : a.k < b.k ? 1 : -1);
   const nFeed = S.feedAll ? ord.length : Math.min(40, ord.length);
   $('tdFeedNote').innerHTML = `· ${nFeed < ord.length ? `hiện ${nFeed}/${ord.length}` : ord.length} đơn · mới nhất trên cùng${ord.length > 40 ? ` <button class="lnk" id="feedAll" style="padding:2px 8px">${S.feedAll ? 'Thu gọn' : 'Xem tất cả'}</button>` : ''}`;
   if ($('feedAll')) $('feedAll').onclick = () => { S.feedAll = !S.feedAll; renderToday(); };
@@ -3127,7 +3129,7 @@ function renderToday(){
 
   /* feed */
   const ord = [...groupBy(L, o => o.id)].map(([id, l]) => ({id, t:l[0].t, min:l[0].min, nv:l[0].nv, pt:l[0].pt, tt:l.reduce((s, o) => s + o.tt, 0), ly:l.reduce((s, o) => s + o.sl, 0),
-    it:l.map(o => esc(`${o.sl}× ${o.mon.replace('Cà phê', 'CF')}`) + chipLy(o)).join(', '), anh:l.map(o => o.ma), tv:l.some(o => o.tv), ml:l.some(o => o.ml), tang:l.some(o => o.tang), dg:chipDongGia(l) + chipDonRieng(l)})).sort((a, b) => (b.min ?? 0) - (a.min ?? 0));
+    it:l.map(o => esc(`${o.sl}× ${o.mon.replace('Cà phê', 'CF')}`) + chipLy(o)).join(', '), anh:l.map(o => o.ma), tv:l.some(o => o.tv), ml:l.some(o => o.ml), tang:l.some(o => o.tang), dg:chipDon2(l) + chipDongGia(l) + chipDonRieng(l)})).sort((a, b) => (b.min ?? 0) - (a.min ?? 0));
   const nFeed = S.feedAll ? ord.length : Math.min(40, ord.length);
   $('tdFeedNote').innerHTML = `· ${nFeed < ord.length ? `hiện ${nFeed}/${ord.length}` : ord.length} đơn · mới nhất trên cùng${ord.length > 40 ? ` <button class="lnk" id="feedAll" style="padding:2px 8px">${S.feedAll ? 'Thu gọn' : 'Xem tất cả'}</button>` : ''}`;
   if ($('feedAll')) $('feedAll').onclick = () => { S.feedAll = !S.feedAll; renderToday(); };
@@ -3991,7 +3993,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.350';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.351';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4049,6 +4051,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.351', ngay:'23/11/2026', nd:['Hôm nay · Đơn mới nhất / Đơn trong kỳ: thêm chip 👥 đơn 2 cho đơn đúng 2 ly']},
   {v:'v1.7.350', ngay:'23/11/2026', nd:['Lãi, dòng tiền dương: đổi từ xanh dương sang xanh lá đậm (nền xanh lá nhạt), ▲ giữ nguyên']},
   {v:'v1.7.349', ngay:'23/11/2026', nd:['Lãi, dòng tiền, tiền cuối tháng dương: xanh dương đậm trên nền xanh nhạt ở mọi bảng, thẻ, biểu đồ lãi; âm: đỏ trên nền đỏ nhạt', 'Ô % dương (biên, % thu hồi vốn, %Đạt từ 100%) có mũi tên ▲; số tăng / đạt toàn dashboard đổi từ xanh lá sang xanh dương đậm', 'Dòng Tổng tô màu theo lãi và to hơn']},
   {v:'v1.7.348', ngay:'23/11/2026', nd:['Bao bì phụ (giấy chống tràn, hũ xốt, túi PE ly 168.977) và khăn giấy (139.620) phân bổ 3 tháng T11–T1/2027 thay vì trừ hết khi mua; tiền đã trả không đổi', 'PNL: dòng bao bì phụ phân bổ chia theo ngày khi xem lẻ ngày / tuần']},
@@ -4060,15 +4063,6 @@ const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều 
   {v:'v1.7.342', ngay:'23/11/2026', nd:['Hoà vốn · Kế hoạch: lương/ngày chỉ lấy tháng này và không tính chủ (trước lấy từ ngày mở bán nên lẫn lương chủ và ca 2–3 người của T10); gồm cả chuyên cần + thưởng; thẻ ghi rõ cách ra số lương']},
   {v:'v1.7.341', ngay:'23/11/2026', nd:['Tab Doanh thu (Sheet) bỏ 2 cột Trích tiền mặt · Đã chuyển TM; thêm cột Đã chuyển tiền app vào quỹ CK — tick ngày nào thì tiền app ngày đó cộng vào quỹ CK', 'Thu chi: thẻ 🛵 App hiện phần chưa vào quỹ, tách be / Xanh SM']},
   {v:'v1.7.340', ngay:'23/11/2026', nd:['Hiệu suất: khi cuộn chỉ ghim 6 ô số chính, không còn che biểu đồ; % size L của khung dưới 5 ly để trống']},
-  {v:'v1.7.339', ngay:'23/11/2026', nd:['Hiệu suất: thẻ mới Xu hướng mỗi ngày — vì sao doanh thu đổi (ngày bán, đơn/ngày, ly/đơn, giá TB/ly cộng lại đúng chênh), ly M + L và giá TB / ly từng ngày, bảng theo thứ trong tuần', 'Hiệu suất · Khung giờ: tách size M / L, thêm doanh thu, giá TB / ly, % size L, số ly đủ trả lương từng khung', 'Hiệu suất · Nhân viên: thêm doanh thu / giờ công, giá TB / ly, AOV, % size L, % ly thẻ thành viên', 'Phân tích sâu: thêm gợi ý yếu tố kéo doanh thu, khung và người mời size L còn yếu']},
-  {v:'v1.7.338', ngay:'23/11/2026', nd:['Nhân sự · Hiệu suất theo giờ lương: thêm đường giá TB / ly (ghi số từng ngày)', 'Bán hàng · Giá TB / ly theo ngày: thêm cột ly size L (trục phải), rê chuột xem % trên tổng ly']},
-  {v:'v1.7.337', ngay:'23/11/2026', nd:['Bán hàng · Tiền mặt / CK theo ngày: thêm đường số ly mỗi ngày (trục phải, ghi số trên từng điểm)']},
-  {v:'v1.7.336', ngay:'23/11/2026', nd:['Tài khoản nhân viên: bảng Chấm công và Ca ở Hôm nay hiện tiền từng ca của chính mình (lương nền, tiền công, lương/giờ); ca người khác để trống']},
-  {v:'v1.7.335', ngay:'23/11/2026', nd:['Nhân sự · tài khoản nhân viên: bảng nhân viên hiện đủ cột lương, thưởng nhưng tiền chỉ ở dòng của chính mình; không có giờ có mặt thật']},
-  {v:'v1.7.334', ngay:'23/11/2026', nd:['Của tôi (nhân viên): thêm Lương giờ, Dậy sớm, Thưởng ly, Thưởng / phạt, ly trong ca — cộng lại đúng Lương tháng này; bỏ ô Sổ tay và Vi phạm', 'Báo cáo · Ca làm và năng suất: số ca không đếm chủ gốc, khớp giờ công']},
-  {v:'v1.7.333', ngay:'23/11/2026', nd:['Sổ tay: thêm cách xin ca — không có ca hôm đó vẫn gõ được /doica 30/11 Duy (xin làm ca của Duy); đổi chéo viết ngày của ai trước cũng được (bot xinca-v1)']},
-  {v:'v1.7.332', ngay:'23/11/2026', nd:['Ly / giờ công chia theo giờ tính công ở mọi nơi (Nhân sự, Hiệu suất, Báo cáo, Kai\'s facts) — cùng số với báo cáo ngày, tuần của bot; tổng giờ công ở Báo cáo bỏ chủ gốc như từng ngày']},
-  {v:'v1.7.331', ngay:'23/11/2026', nd:['Đổi tên: Giờ danh nghĩa → Giờ tính công, Lương/giờ danh nghĩa → Lương/giờ tính công (cách tính không đổi; tài khoản nhân viên vẫn gọi Giờ công)']}
 ];
 /** Còn treo: nhóm · việc (chuỗi hoặc hàm) · cần gì / từ ai · xong() tự kiểm theo dữ liệu (không có thì chỉ xoá tay khỏi danh sách này khi đã giải quyết) · tt() chữ trạng thái */
 const BACKLOG = [
