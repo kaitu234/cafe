@@ -3792,7 +3792,7 @@ function renderPnl(){
       laiGop:P.laiGop, pcLai:P.laiGop ? 1 : null, chung, lai:P.laiVH, cho:P.choDi}, cols:[
     {k:'mon', l:'Món', f:(v, r) => r && r.chuaBan ? `<span class="muted">${esc(v)}</span>` : esc(v)}, {k:'nhom', l:'Nhóm', f:v => v ? `<span class="muted">${esc(v)}</span>` : ''}, {k:'ly', l:'Ly', r:1, f:(v, r) => r && r.chuaBan ? '—' : fmt(v)}, {k:'dt', l:'Doanh thu', r:1, f:fmt}, {k:'asp', l:'Giá bán TB', r:1, f:fmt}, {k:'giaMenu', l:'Giá menu', r:1, f:fmt}, {k:'gvLy', l:'Giá vốn/ly', r:1, f:fmt},
     {k:'laiLy', l:'Lãi gộp/ly', r:1, f:fmt, cls:lxSo}, {k:'laiMenu', l:'Lãi/ly ở giá menu', r:1, f:fmt, cls:lxSo}, {k:'bienMenu', l:'Biên ở giá menu', r:1, f:v => pct(v, 0), cls:lxPct}, {k:'bien', l:'Biên gộp', r:1, f:v => pct(v, 0), cls:lxPct},
-    {k:'laiGop', l:'Lãi gộp', r:1, f:fmt, cls:lxSo}, {k:'pcLai', l:'% lãi gộp', r:1, f:v => pct(v, 0), cls:lxPct},
+    {k:'laiGop', l:'Lãi gộp', r:1, f:fmt, cls:lxSo}, {k:'pcLai', l:'% lãi gộp', r:1, f:v => pct(v, 1), cls:lxPct},
     {k:'chung', l:'Chi phí chung (theo ly)', r:1, f:fmt}, {k:'lai', l:'Lãi sau chi phí chung', r:1, f:fmt, cls:lxSo},
     {k:'cho', l:'Cho đi do khuyến mãi', r:1, f:v => v ? fmt(v) : '—'}, {k:'ghi', l:'Ghi chú', f:v => (v || []).map(t => `<span class="pill ${/^(chưa bán|không còn)/.test(t) ? 'neu' : 'warn'}" style="white-space:normal;min-width:150px;max-width:240px">${esc(t)}</span>`).join(' ')}]});
 
