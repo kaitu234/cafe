@@ -1552,7 +1552,7 @@ html.mcap{background:var(--paper)}
     </div>
     <div class="kpis" id="hrKpis"></div>
     <div class="card">
-      <div class="ct">Nhân viên trong kỳ <span class="nt">· giờ &amp; tiền công từ ChamCong (đã gồm phụ cấp dậy sớm và khoản trừ trễ quá 30p từ 12/11; phụ cấp ca 1 người đã bỏ từ 01/11; chủ quán chỉ ghi giờ, không tính lương từ 01/11; thử việc 100.000đ/ngày; chuyên cần tính riêng ở bảng lương của bot) · ly trong ca = đơn nằm giữa giờ vào và giờ ra · ly/giờ = ly trong ca ÷ giờ làm · chủ quán: tính lương, không tính hiệu suất</span></div>
+      <div class="ct">Nhân viên trong kỳ <span class="nt">· giờ &amp; tiền công từ ChamCong (Lương giờ + Dậy sớm + Chuyên cần + Thưởng ly + Thưởng/phạt = Thực nhận; Lương giờ đã trừ trễ quá 30p từ 12/11; phụ cấp ca 1 người đã bỏ từ 01/11; chủ quán chỉ ghi giờ, không tính lương từ 01/11; thử việc 100.000đ/ngày) · ly trong ca = đơn nằm giữa giờ vào và giờ ra · ly/giờ = ly trong ca ÷ giờ có mặt · chủ quán: tính lương, không tính hiệu suất</span></div>
       <div class="g2">
         <div><div class="lbl">Tiền công theo người</div><div class="cw sm"><canvas id="cHrTien" aria-label="Tiền công theo người"></canvas></div></div>
         <div><div class="lbl">Giờ làm theo người</div><div class="cw sm"><canvas id="cHrGio" aria-label="Giờ làm theo người"></canvas></div></div>
@@ -1656,6 +1656,8 @@ function gioLuong(c, het){
  *  DANH NGHĨA = giờ tính lương = trong ca + OT được trả (OT chủ duyệt tối đa 60 phút/ca → tối đa 6 giờ) · THỰC TẾ = giờ có mặt thật, check-in tới check-out (gồm phút ở lại không trả).
  *  Lương/giờ = Thực nhận ÷ từng loại giờ. Luật trả OT KHÔNG đổi (vào sớm ≤ OT_TOI_DA; về muộn chỉ khi chủ duyệt). Tiền công 0 (chủ) → không tính. */
 const gioDN = (c, het) => gioLuong(c, het);
+/* v1.7.326 (chủ 23/11): tài khoản nhân viên chỉ có 1 loại giờ = danh nghĩa, gọi là "Giờ công" (không có giờ có mặt thật) */
+const tenGioDN = () => VAI === 'chu' ? 'Giờ danh nghĩa' : 'Giờ công', cotCoMat = col => VAI === 'chu' ? [col] : [];
 function gioThucTe(c, het){ if (c.ra) return c.gio || 0; const h = het || null; return h ? Math.max(0, h - c.vao) / 36e5 : 0; }
 /** Phút trong giờ ca theo lịch, không gồm OT (= bot c.phut − c.ot = cột J − K) — chỉ để tách "giờ trong ca + giờ vào sớm" ở ô Giờ làm của nhân viên */
 function gioTrongCa(c, het){
@@ -2953,10 +2955,10 @@ function renderTdKy(){
   /* ca & két */
   datCt('tTdCong', 'Ca & két trong kỳ', `· ${K.cong.length} ca · ${K.gioNV.toLocaleString('vi-VN', {maximumFractionDigits:1})} giờ công`);
   const tm = d => d ? `${p2(d.getHours())}:${p2(d.getMinutes())}` : '';
-  table({id:'tTdCong', rows:K.cong.map(x => Object.assign({}, x, {t:x.vao.getTime()})), sortDefault:{k:'t', d:-1}, cols:[
+  table({id:'tTdCong', rows:K.cong.map(x => Object.assign({}, x, {t:x.vao.getTime(), gio: VAI === 'chu' ? x.gio : gioDN(x, x.ra || gioRaTam(x))})), sortDefault:{k:'t', d:-1}, cols:[
     {k:'k', l:'Ngày', f:v => `${thu(v)} ${dShort(v)}`}, {k:'nv', l:'Nhân viên'}, {k:'t', l:'Vào', f:(v, r) => tm(r.vao)},
     {k:'ra', l:'Ra', f:(v, r) => v ? tm(v) : (r.k === tk ? '<span class="pill good">đang làm</span>' : '—')},
-    {k:'gio', l:'Giờ', r:1, f:(v, r) => r.ra ? (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'}]});
+    {k:'gio', l:VAI === 'chu' ? 'Giờ có mặt thật' : 'Giờ công', r:1, f:(v, r) => r.ra ? (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'}]});
   if (!K.cong.length) $('tTdCong').querySelector('tbody').innerHTML = '<tr><td colspan="5" class="muted" style="text-align:center;padding:14px">Kỳ này chưa có ca chấm công.</td></tr>';
   banTheoNguoi(K.L, K.cong);
   const daChot = K.ket.filter(x => x.chot), chuaChot = K.ket.filter(x => !x.chot && x.bot), lech = daChot.reduce((x, y) => x + (y.chenh || 0), 0);
@@ -2969,7 +2971,7 @@ function renderToday(){
   datCt('tdMoney', 'Tiền & lãi hôm nay', '· két phải có = tiền mặt − chi từ két · lãi như tab PNL');
   datCt('cPace', 'Nhịp bán cộng dồn', '· số ly lũy kế theo 15 phút · nét đứt = cùng thứ tuần trước · đường mờ = hôm qua');
   datCt('cTdHour', 'Ly theo giờ', '· cột = hôm nay · đường mờ = hôm qua');
-  datCt('tTdMon', 'Món hôm nay', ''); datCt('tdFeed', 'Đơn mới nhất'); datCt('tTdCong', 'Ca, lương & két hôm nay', '· danh nghĩa = giờ tính lương (ca + OT được trả, tối đa 6 giờ) · thực tế = giờ có mặt thật · lương/giờ = tiền công, chuyên cần, thưởng ly ÷ giờ');
+  datCt('tTdMon', 'Món hôm nay', ''); datCt('tdFeed', 'Đơn mới nhất'); datCt('tTdCong', 'Ca, lương & két hôm nay', VAI !== 'chu' ? '· giờ công = giờ trong ca + OT được duyệt' : '· danh nghĩa = giờ tính lương (ca + OT được trả, tối đa 6 giờ) · thực tế = giờ có mặt thật · lương/giờ = tiền công, chuyên cần, thưởng ly ÷ giờ');
   const now = new Date(), tk = today(), k = S.tdK || tk, isToday = k === tk;
   const nowMin = isToday ? now.getHours() * 60 + now.getMinutes() : 24 * 60;
   $('tdDay').textContent = `${thu(k) === 'CN' ? 'Chủ nhật' : 'Thứ ' + thu(k).slice(1)} · ${dShort(k)}/${k.slice(0,4)}${isToday ? '' : k < tk ? ' · đã qua' : ' · chưa tới'}${leOf(k) ? ' · ' + leOf(k) : ''}${wxTxt(k) ? ' · ' + wxTxt(k) : ''}`;
@@ -3084,7 +3086,7 @@ function renderToday(){
     return Object.assign({}, x, {t:x.vao.getTime(), gioL:gl, gioDN:dn, tienN:tien, tamT:x.tien == null, lgDN: tien && dn ? (tien + (x.ccPb || 0) + (x.tl || 0)) / dn : null, lgTT: tien && gm ? (tien + (x.ccPb || 0) + (x.tl || 0)) / gm : null}); }), sortDefault:{k:'t', d:1}, cols:[
     {k:'nv', l:'Nhân viên'}, {k:'t', l:'Vào', f:(v, r) => tm(r.vao)},
     {k:'ra', l:'Ra', f:(v, r) => v ? tm(v) : (isToday ? '<span class="pill good">đang làm</span>' : '—')},
-    {k:'gio', l:'Giờ có mặt thật', r:1, f:(v, r) => r.ra ? (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'}, {k:'gioDN', l:'Giờ danh nghĩa', r:1, f:v => v ? v.toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'},
+    ...cotCoMat({k:'gio', l:'Giờ có mặt thật', r:1, f:(v, r) => r.ra ? (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'}), {k:'gioDN', l:tenGioDN(), r:1, f:v => v ? v.toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'},
     {k:'tienN', l:'Tiền công', r:1, f:(v, r) => v == null ? '—' : fmt(v) + (r.tamT ? ' <span class="muted">(tạm)</span>' : '')}, {k:'lgDN', l:'Lương/giờ danh nghĩa', r:1, f:v => v ? fmt(v) : '—'}, {k:'lgTT', l:'Lương/giờ thực tế', r:1, f:v => v ? fmt(v) : '—'}, {k:'note', l:'Ghi chú', f:v => esc(v || '')}]});
   if (!cong.length) $('tTdCong').querySelector('tbody').innerHTML = `<tr><td colspan="9" class="muted" style="text-align:center;padding:14px">Chưa ai /checkin ${isToday ? 'hôm nay' : 'ngày này'}.</td></tr>`;
   banTheoNguoi(L, cong);
@@ -3893,7 +3895,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.326';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.327';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3951,6 +3953,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.327', ngay:'23/11/2026', nd:['Tài khoản nhân viên: chỉ còn 1 loại giờ, gọi là Giờ công (= giờ danh nghĩa: giờ trong ca + OT được duyệt), bỏ giờ có mặt thật ở Nhân sự, Hôm nay, thẻ Của tôi']},
   {v:'v1.7.326', ngay:'23/11/2026', nd:['Nhân sự: bảng nhân viên xếp lại — Dậy sớm, Chuyên cần, Thưởng ly vào cụm tiền; cộng ngang từ Lương giờ là ra Thực nhận (Lương giờ = Tiền công bot trừ dậy sớm); Ly, Trễ nằm cạnh giờ']},
   {v:'v1.7.325', ngay:'23/11/2026', nd:['Nhân sự: bảng nhân viên bỏ cột Ca 1 người và Quên check-out; cột giờ ghi rõ Giờ có mặt thật và Giờ danh nghĩa (= giờ tính lương)']},
   {v:'v1.7.324', ngay:'23/11/2026', nd:['Nhân sự + Hôm nay: chỉ còn 2 loại lương/giờ — danh nghĩa (thực nhận ÷ giờ tính lương: ca + OT được trả, tối đa 6 giờ) và thực tế (÷ giờ có mặt thật); bỏ danh nghĩa cũ 5 giờ/ca, gộp cột Giờ tính lương. Luật trả lương, OT không đổi']},
@@ -5520,8 +5523,8 @@ function renderCuaToi(){
   $('hrToiNt').textContent = '· ' + me.ten + ' · chỉ bạn thấy';
   $('hrToi').innerHTML = '<div class="toi">'
     + o('Bậc', esc(me.bac || '—'), '<span class="s">' + (me.gioTN != null ? (+me.gioTN).toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ thâm niên' : '') + (me.conLen != null ? ' · còn ' + (+me.conLen).toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ lên bậc' : '') + '</span>', 'toiB')
-    + o('Tháng này', th.length + ' ca', th.reduce((s, c) => s + (c.gio || 0), 0).toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ làm')
-    + o('Lương tháng này', th.length ? fmt(luongT) + ' đ' : '—', th.length ? (gioCa ? '<span class="chip">≈ ' + fmt(luongT / gioCa) + ' đ/giờ</span>' : '') + '<span class="s">' + gioCa.toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ tính lương' + (tamL ? ' · tạm tính' : '') + '</span>' : '<span class="s">chưa có ca</span>', 'toiL')
+    + o('Tháng này', th.length + ' ca', gioCa.toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ công')
+    + o('Lương tháng này', th.length ? fmt(luongT) + ' đ' : '—', th.length ? (gioCa ? '<span class="chip">≈ ' + fmt(luongT / gioCa) + ' đ/giờ</span>' : '') + '<span class="s">' + gioCa.toLocaleString('vi-VN', {maximumFractionDigits:1}) + ' giờ công' + (tamL ? ' · tạm tính' : '') + '</span>' : '<span class="s">chưa có ca</span>', 'toiL')
     + (() => { const lan = cc ? cc.thuong.filter(k => String(k).slice(0, 7) === m0).length : 0;   /* v1.7.209 (chủ 12/11): ô chuyên cần nổi bật + chip */
         return o('Chuyên cần', cc ? cc.chuoi + '/' + CC.soCa + ' ca' : '—', cc ? '<span class="chip">' + 'còn ' + (CC.soCa - cc.chuoi) + ' ca → +' + fmt(CC.tien) + ' đ' + '</span>'
           + '<span class="s">' + (lan ? 'đạt ' + lan + ' lần tháng này · +' + fmt(lan * CC.tien) + ' đ' : 'chưa đạt lần nào tháng này') + '</span>' : '<span class="s">chưa có ca</span>', 'toiC'); })()
@@ -5869,7 +5872,7 @@ function renderHr(){
     <div class="kpi main"><span class="lb">Dẫn đầu thâm niên</span><span class="v">${dan ? esc(dan.ten) : '—'}</span><span class="s">${dan ? f1(dan.gioTN) + ' giờ · ' + esc(dan.bac || '') : ''}</span></div>`) + `
     ${meT ? (() => { /* v1.7.214 (chủ 12/11): giờ làm của nhân viên = giờ TÍNH LƯƠNG (trong ca + vào sớm ≤ 30p) — đúng số bot cộng vào thâm niên (bot c.phut), không dùng giờ thực check-in→out; ca chưa chốt chưa cộng thâm niên */
       const tam = C.filter(c => (c.id || c.nv) === (rMe && (rMe.id || rMe.ten)) && !c.ra).length, gl = rMe ? rMe.gioL : 0, dn = rMe ? rMe.gioTC : 0, som = gl - dn;
-      return `<div class="kpi tgt" data-nvok title="Giờ tính lương = giờ trong ca + vào sớm (tối đa 30 phút/ca). Đây cũng là số giờ cộng vào thâm niên."><span class="lb">Giờ làm · ${ky}</span><span class="v">${f1(gl)}</span><span class="s">${fmt(rMe ? rMe.ca : 0)} ca · ${f1(dn)} giờ trong ca${som >= 0.05 ? ` + ${f1(som)} giờ vào sớm` : ''}${tam ? ` · ${tam} ca chưa chốt (chưa cộng thâm niên)` : ''}</span></div>`; })()
+      return `<div class="kpi tgt" data-nvok title="Giờ công = giờ trong ca + vào sớm (tối đa 30 phút/ca) + phần chủ duyệt. Đây cũng là số giờ cộng vào thâm niên."><span class="lb">Giờ công · ${ky}</span><span class="v">${f1(gl)}</span><span class="s">${fmt(rMe ? rMe.ca : 0)} ca · ${f1(dn)} giờ trong ca${som >= 0.05 ? ` + ${f1(som)} giờ vào sớm / được duyệt` : ''}${tam ? ` · ${tam} ca chưa chốt (chưa cộng thâm niên)` : ''}</span></div>`; })()
     : `<div class="kpi tgt tn"><span class="lb">Giờ làm · ${ky}</span><span class="v">${f1(gio)}</span><span class="s">thực tế (có mặt) · danh nghĩa ${f1(gioDNs)} giờ · ${fmt(C.length)} ca</span></div>`}
     <div class="kpi tgt hot"><span class="lb">Thực nhận · ${ky}</span><span class="v">${fmt(tnTong)}</span><span class="s">công ${fmt(tien)}${ccTienTong ? ' + chuyên cần ' + fmt(ccTienTong) : ''}${tlTong ? ' + thưởng ly ' + fmt(tlTong) : ''}${tpTong ? ` ${tpTong > 0 ? '+' : '−'} thưởng/phạt ${fmt(Math.abs(tpTong))}` : ''}${chuaTinh ? ` · ${chuaTinh} ca chưa tính` : ''}</span></div>
     ${VAI === 'nhanvien' ? (() => { /* v1.7.209 (chủ 12/11): nhân viên thấy lương/giờ của chính mình — cùng cách tính ô Lương ở thẻ Của tôi (lương ÷ giờ trong ca), server chỉ gửi lương của người này */
@@ -5877,7 +5880,7 @@ function renderHr(){
       const cm = D.cong.filter(c => c.id === me.id && c.k >= S.from && c.k <= S.to); let l = 0, g = 0;
       cm.forEach(c => { const het = c.ra || gioRaTam(c); l += (c.cc || 0) + (c.tl || 0); g += gioDN(c, het); if (c.tien != null) l += c.tien; else if (c.luongGio && het) l += gioLuong(c, het) * c.luongGio; });
       l += (D.thuongPhat || []).filter(x => x.id === me.id && x.k >= S.from && x.k <= S.to).reduce((s, x) => s + x.tien, 0);
-      return `<div class="kpi tgt hot" data-nvok><span class="lb">Lương / giờ của bạn</span><span class="v">${g ? fmt(l / g) : '—'}</span><span class="s">lương ${fmt(l)} ÷ ${f1(g)} giờ tính lương · ${ky}</span></div>`; })()
+      return `<div class="kpi tgt hot" data-nvok><span class="lb">Lương / giờ của bạn</span><span class="v">${g ? fmt(l / g) : '—'}</span><span class="s">lương ${fmt(l)} ÷ ${f1(g)} giờ công · ${ky}</span></div>`; })()
     : `<div class="kpi tgt hot"><span class="lb">Lương / giờ danh nghĩa</span><span class="v">${dnNV ? fmt(tienNV / dnNV) : '—'}</span><span class="s">thực nhận (gồm thưởng, chuyên cần) ÷ giờ tính lương (ca + OT được trả, tối đa 6 giờ/ca)${nvF && nvF.chu ? ' · chủ không lương' : ''}</span></div>`}
     <div class="kpi tgt hot"><span class="lb">Lương / giờ thực tế</span><span class="v">${mtNV ? fmt(tienNV / mtNV) : '—'}</span><span class="s">thực nhận ÷ giờ có mặt thật (check-in → check-out)${nvF && nvF.luong ? ` · nền ${fmt(nvF.luong)}` : ''}</span></div>
     ${!nvF && VAI !== 'nhanvien' ? (() => { /* v1.7.225 (chủ 12/11): % lương / doanh thu = tiền công (gồm thưởng/phạt, như ô Tiền công) ÷ doanh thu đơn bot cùng kỳ (cả quán, không theo bộ lọc món/thanh toán); ngưỡng ≤25% tốt · ≤35% để ý · >35% cao. Chỉ hiển thị trên dash, Sheet/bot không có số này */
@@ -5921,18 +5924,18 @@ function renderHr(){
     } }
   $('hrKpis').innerHTML = `
     <div class="kpi main"><span class="lb">Ca đã chấm</span><span class="v">${fmt(C.length)}</span><span class="s">${rows.length} người${tre ? ` · <b>${tre} lần trễ</b>` : ' · không ai trễ'}</span></div>
-    <div class="kpi main"><span class="lb">Giờ làm</span><span class="v">${gio.toLocaleString('vi-VN', {maximumFractionDigits:1})}</span><span class="s">TB ${C.length ? (gio / C.length).toLocaleString('vi-VN', {maximumFractionDigits:1}) : '—'} giờ/ca · tính lương ${gioL.toLocaleString('vi-VN', {maximumFractionDigits:1})} giờ (từ 01/11 về muộn không trả)</span></div>
+    <div class="kpi main"><span class="lb">${VAI === 'chu' ? 'Giờ có mặt thật' : 'Giờ công'}</span><span class="v">${(VAI === 'chu' ? gio : gioDNs).toLocaleString('vi-VN', {maximumFractionDigits:1})}</span><span class="s">TB ${C.length ? ((VAI === 'chu' ? gio : gioDNs) / C.length).toLocaleString('vi-VN', {maximumFractionDigits:1}) : '—'} giờ/ca${VAI === 'chu' ? ` · danh nghĩa ${gioL.toLocaleString('vi-VN', {maximumFractionDigits:1})} giờ (về muộn chỉ trả khi duyệt)` : ''}</span></div>
     <div class="kpi main"><span class="lb">Ly / giờ công</span><span class="v">${gioNV ? (ly / gioNV).toLocaleString('vi-VN', {maximumFractionDigits:1}) : '—'}</span><span class="s">${fmt(ly)} ly trong ca nhân viên ÷ ${gioNV.toLocaleString('vi-VN', {maximumFractionDigits:1})} giờ${D.chuTen.size ? ' · không tính chủ' : ''}</span></div>
     <div class="kpi main"><span class="lb">Lương tạm tính</span><span class="v">${fmtM(tnTong)}</span><span class="s">cột Tiền công do bot tính (đã gồm phụ cấp dậy sớm ${fmt(somTong)} ca${motTong ? ` + ca 1 người ${fmt(motTong)} ca` : ''})${tpTong ? ` ${tpTong > 0 ? '+' : '−'} ${fmt(Math.abs(tpTong))} đ thưởng/phạt chủ ghi` : ''}${ccTienTong ? ` + chuyên cần ${fmt(ccTienTong)} đ (${fmt(ccTong)} lần)` : ''}${tlTong ? ` + thưởng ly theo ngày ${fmt(tlTong)} đ` : ''}${chuaTinh ? ` · ${chuaTinh} ca chưa tính` : ''}${(() => { const lyKy = D.orders.filter(o => o.k >= S.from && o.k <= S.to).reduce((s, o) => s + o.sl, 0); return lyKy && tnTong ? ` · ${fmt(tnTong / lyKy)} đ/ly bán` : ''; })()}</span></div>
     <div class="kpi tgt"><span class="lb">Chốt ca</span><span class="v">${fmt(chot.length)}</span><span class="s">trên ${new Set(D.orders.filter(o => o.k >= S.from && o.k <= S.to).map(o => o.k)).size} ngày có bán</span></div>
     <div class="kpi tgt"><span class="lb">Chênh két</span><span class="v ${chot.reduce((s, c) => s + c.chenh, 0) < 0 ? 'dn' : ''}">${chot.length ? fmt(chot.reduce((s, c) => s + c.chenh, 0)) : '—'}</span><span class="s">dương = dư · âm = thiếu</span></div>`;
   veCotNgang('cHrTien', rows.slice().sort((a, b) => b.thucNhan - a.thucNhan).map(r => ({label:r.nv, v:r.thucNhan})), v => fmt(v) + ' đ');
-  veCotNgang('cHrGio', rows.slice().sort((a, b) => b.gio - a.gio).map(r => ({label:r.nv, v:+r.gio.toFixed(1)})), v => v.toLocaleString('vi-VN') + ' giờ');
+  veCotNgang('cHrGio', rows.map(r => ({label:r.nv, v:+(VAI === 'chu' ? r.gio : r.gioDN).toFixed(1)})).sort((a, b) => b.v - a.v), v => v.toLocaleString('vi-VN') + ' giờ');
   rows.forEach(r => { r.tienGio = r.tien - r.som * PHU_CAP.som; });
   table({id:'tHr', rows, sortDefault:{k:'gio', d:-1}, rowKey:r => r.ten, selKey:S.nv, onRow:k => { S.nv = S.nv === k ? '' : k; syncFilters(); render(); },   // v1.7.42: khoá lọc theo tên (đơn bot chỉ ghi tên)
     total:{ca:C.length, gio, gioDN:gioDNs, lgDN: gioDNt ? rows.filter(r => r.gioDNt).reduce((s, r) => s + r.thucNhan, 0) / gioDNt : null, lgTT: (g => g ? rows.filter(r => r.gioMt).reduce((s, r) => s + r.thucNhan, 0) / g : null)(rows.reduce((s, r) => s + r.gioMt, 0)), ly, lyh: gioNV ? ly / gioNV : null, tienGio:tien - somTong * PHU_CAP.som, tp:tpTong, thucNhan:tnTong, som:somTong, cc:ccTong, ccT:ccTienTong, tl:tlTong, tre},
     /* v1.7.326 (chủ 23/11): xếp theo mạch công việc → tiền: Ca · giờ · ly · trễ | Lương giờ + Dậy sớm + Chuyên cần + Thưởng ly + Thưởng/phạt = Thực nhận | 2 loại lương/giờ. Lương giờ = Tiền công bot (cột P) − dậy sớm (tháng 10 gồm cả phụ cấp ca 1 người) */
-    cols:[{k:'nv', l:'Nhân viên', f:(v, r) => esc(v) + (r.chu ? ' <span class="pill neu" title="Tính lương, không tính hiệu suất, không thưởng">chủ</span>' : '')}, {k:'ca', l:'Ca', r:1, f:fmt}, {k:'gio', l:'Giờ có mặt thật', r:1, heat:1, f:v => (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})}, {k:'gioDN', l:'Giờ danh nghĩa', r:1, f:v => v ? v.toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'},
+    cols:[{k:'nv', l:'Nhân viên', f:(v, r) => esc(v) + (r.chu ? ' <span class="pill neu" title="Tính lương, không tính hiệu suất, không thưởng">chủ</span>' : '')}, {k:'ca', l:'Ca', r:1, f:fmt}, ...cotCoMat({k:'gio', l:'Giờ có mặt thật', r:1, heat:1, f:v => (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})}), {k:'gioDN', l:tenGioDN(), r:1, f:v => v ? v.toLocaleString('vi-VN', {maximumFractionDigits:2}) : '—'},
       {k:'ly', l:'Ly trong ca', r:1, f:fmt}, {k:'lyh', l:'Ly/giờ', r:1, f:v => v == null ? '—' : v.toLocaleString('vi-VN', {maximumFractionDigits:1})}, {k:'tre', l:'Trễ', r:1, f:fmt, cls:v => v ? 'dn' : ''},
       {k:'tienGio', l:'Lương giờ', r:1, f:(v, r) => fmt(v) + (r.chuaTinh ? ` <span class="pill warn" title="Ca chưa checkout hoặc bot chưa tính">${r.chuaTinh} ca chưa tính</span>` : '')},
       {k:'som', l:'Dậy sớm', r:1, f:v => !v ? '—' : VAI === 'chu' ? `+${fmt(v * PHU_CAP.som)} <span class="muted">${fmt(v)} ca</span>` : `${fmt(v)} ca`},   /* v1.7.303: nhân viên chỉ thấy số ca, không thấy tiền của từng người */
@@ -5946,8 +5949,8 @@ function renderHr(){
   table({id:'tCong', rows:C.map(c => { const h = c.ra || gioRaTam(c), x = h && !(c.ra && c.phutL != null) ? phutLuongCore(c.k, c.vao, h, caCuaCong(c), otDuyet(c.note)) : null;
     const dn = gioDN(c, h), gm = gioThucTe(c, h); return Object.assign({}, c, {t:c.vao.getTime(), nv:D.nhanNv(c), gioDN:dn, lgDN: c.tien && dn ? (c.tien + (c.ccPb || 0) + (c.tl || 0)) / dn : null, lgTT: c.tien && gm ? (c.tien + (c.ccPb || 0) + (c.tl || 0)) / gm : null, otT:x ? x.ot : c.otTinh, otB:x ? x.otBo : c.otBo, tam:!c.ra}); }), sortDefault:{k:'t', d:-1}, cols:[   // v1.7.42 (Fable 5 T-02)
     {k:'t', l:'Ngày', f:(v, r) => `${thu(r.k)} ${dShort(r.k)}`}, {k:'nv', l:'NV'}, {k:'vao', l:'Vào', f:v => tm(v)}, {k:'ra', l:'Ra', f:v => tm(v)},
-    {k:'gio', l:'Giờ có mặt thật', r:1, f:v => (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})},
-    {k:'gioDN', l:'Giờ danh nghĩa', r:1, f:(v, r) => `${(v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})}${r.otT ? ` <span class="muted" title="${r.k >= OT_RA_BO_TU ? 'Phút vào sớm trước giờ bắt đầu ca' : 'OT vào sớm + về muộn'} (tối đa ${OT_TOI_DA} phút/ca)">+${r.otT}p</span>` : ''}${r.otB && r.k < OT_RA_BO_TU ? ` <span class="muted" title="OT vượt ${OT_TOI_DA} phút không tính">−${r.otB}p</span>` : ''}${r.tam ? ' <span class="muted">(tạm)</span>' : ''}`}, {k:'luongGio', l:'Lương nền/giờ', r:1, f:v => v ? fmtK(v) : '—'},
+    ...cotCoMat({k:'gio', l:'Giờ có mặt thật', r:1, f:v => (v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})}),
+    {k:'gioDN', l:tenGioDN(), r:1, f:(v, r) => `${(v || 0).toLocaleString('vi-VN', {maximumFractionDigits:2})}${r.otT ? ` <span class="muted" title="${r.k >= OT_RA_BO_TU ? 'Phút vào sớm trước giờ bắt đầu ca' : 'OT vào sớm + về muộn'} (tối đa ${OT_TOI_DA} phút/ca)">+${r.otT}p</span>` : ''}${r.otB && r.k < OT_RA_BO_TU ? ` <span class="muted" title="OT vượt ${OT_TOI_DA} phút không tính">−${r.otB}p</span>` : ''}${r.tam ? ' <span class="muted">(tạm)</span>' : ''}`}, {k:'luongGio', l:'Lương nền/giờ', r:1, f:v => v ? fmtK(v) : '—'},
     {k:'tien', l:'Tiền công', r:1, f:v => v == null ? '—' : fmt(v)}, {k:'lgDN', l:'Lương/giờ danh nghĩa', r:1, f:v => v ? fmt(v) : '—'}, {k:'lgTT', l:'Lương/giờ thực tế', r:1, f:v => v ? fmt(v) : '—'}, {k:'note', l:'Ghi chú', f:v => esc(v || '')}]});
 }
 
