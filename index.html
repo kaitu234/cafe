@@ -3513,7 +3513,7 @@ function caKyCore(R){
 function giaMenuCore(orders, menu, ca){
   const gia = {}; Object.values(menu).forEach(m => { if (m.gia) gia[String(m.ma).toLowerCase()] = m.gia; });
   let dt = 0, ly = 0; orders.forEach(o => { const g = gia[String(o.ma).toLowerCase()]; if (g){ dt += o.sl * g; ly += o.sl; } });
-  return {dt, ly, tb:ly ? dt / ly : null, gvPct:dt ? ca.gv / dt : null, lai:ca.lai + dt - ca.rev};
+  return {dt, ly, tb:ly ? dt / ly : null, gvPct:ly && cogsO() != null ? cogsO() / (dt / ly) : null, lai:ca.lai + dt - ca.rev};
 }
 function vePnlThang(){
   if (!$('pnlCaKy')) return;
@@ -3974,7 +3974,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.345';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.346';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4032,6 +4032,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.346', ngay:'23/11/2026', nd:['PNL: % giá vốn ở giá menu tính theo giá vốn / ly bình quân như Sheet (44,2%)']},
   {v:'v1.7.345', ngay:'23/11/2026', nd:['PNL: thêm thẻ Kết quả theo tháng · cả kỳ như Sheet Tổng hợp — 6 ô tổng (doanh thu, chi hoạt động, lãi, đầu tư, vốn góp, tiền còn lại), dòng so sánh ở giá menu, bảng từng tháng đủ cột', 'Bảng Tổng hợp theo tháng (Thu chi): hàng cho kèm chuyển từ Vận hành sang Giá vốn cho khớp 2 cột Sheet; lãi không đổi']},
   {v:'v1.7.344', ngay:'23/11/2026', nd:['Hoà vốn: chi vận hành cũng chỉ lấy tháng này (khoản cả tháng giữ nguyên, khoản còn lại quy ra 30 ngày) — trước lẫn chi T10 và cả phí đô thị phân bổ của T12, T1']},
   {v:'v1.7.343', ngay:'23/11/2026', nd:['Mặt bằng miễn phí thêm T1/2027: thuê chỗ + điện nước 2.000.000 đ/tháng tính từ T2/2027 (trước T1/2027) ở lãi lỗ, Kế hoạch, dự phóng 12 tháng, hoà vốn; khớp tab Chi cố định']},
