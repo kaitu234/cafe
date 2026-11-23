@@ -3895,7 +3895,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.332';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.333';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3953,6 +3953,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.333', ngay:'23/11/2026', nd:['Sổ tay: thêm cách xin ca — không có ca hôm đó vẫn gõ được /doica 30/11 Duy (xin làm ca của Duy); đổi chéo viết ngày của ai trước cũng được (bot xinca-v1)']},
   {v:'v1.7.332', ngay:'23/11/2026', nd:['Ly / giờ công chia theo giờ tính công ở mọi nơi (Nhân sự, Hiệu suất, Báo cáo, Kai\'s facts) — cùng số với báo cáo ngày, tuần của bot; tổng giờ công ở Báo cáo bỏ chủ gốc như từng ngày']},
   {v:'v1.7.331', ngay:'23/11/2026', nd:['Đổi tên: Giờ danh nghĩa → Giờ tính công, Lương/giờ danh nghĩa → Lương/giờ tính công (cách tính không đổi; tài khoản nhân viên vẫn gọi Giờ công)']},
   {v:'v1.7.330', ngay:'23/11/2026', nd:['Lịch làm theo đợt: tháng này gồm cả ngày đã qua (theo chấm công) — đợt và tổng ngày / giờ tính trọn tháng, vd Quỳnh Nga 20–24/11; chuỗi chuyên cần dự kiến vẫn tính từ hôm nay']},
@@ -3963,17 +3964,7 @@ const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều 
   {v:'v1.7.325', ngay:'23/11/2026', nd:['Nhân sự: bảng nhân viên bỏ cột Ca 1 người và Quên check-out; cột giờ ghi rõ Giờ có mặt thật và Giờ danh nghĩa (= giờ tính lương)']},
   {v:'v1.7.324', ngay:'23/11/2026', nd:['Nhân sự + Hôm nay: chỉ còn 2 loại lương/giờ — danh nghĩa (thực nhận ÷ giờ tính lương: ca + OT được trả, tối đa 6 giờ) và thực tế (÷ giờ có mặt thật); bỏ danh nghĩa cũ 5 giờ/ca, gộp cột Giờ tính lương. Luật trả lương, OT không đổi']},
   {v:'v1.7.323', ngay:'23/11/2026', nd:['Doanh thu thuần + Hôm nay: thêm bảng 💵 Tiền mặt theo đợt làm việc (mỗi đợt = các ngày bán liên tiếp của cùng người làm ca, vd Quỳnh Nga 20–23/11) — hai tab cùng một bảng, số lấy từ chốt ca như bảng doanh thu hằng ngày']},
-  {v:'v1.7.322', ngay:'22/11/2026', nd:['Tài liệu: tạm gỡ Menu cầm tay bản clean (khối Trà demo chưa đạt, chủ nghiên cứu thêm); bản 2 và menu đang dùng có icon vẫn giữ']},
-  {v:'v1.7.321', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean bỏ chữ phụ cạnh tiêu đề nhóm; 3 ly trà demo làm lại từ ly cà phê sữa máy (nước trong, có đá) theo ảnh mẫu — mãng cầu trắng kem, măng cụt tím, lựu đỏ']},
-  {v:'v1.7.320', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean — 3 ly trà demo chỉnh màu theo ảnh mẫu (mãng cầu hổ phách, măng cụt vàng cam, lựu đỏ), thêm hình trái cây mãng cầu / măng cụt / lựu ở góc dưới ly']},
-  {v:'v1.7.319', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean — đường kẻ tiêu đề nhóm nét liền, chữ phụ đậm hơn; dòng giá cà phê đen / sữa có lại chữ máy / phin cạnh icon']},
-  {v:'v1.7.318', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean hàng cuối xếp Cacao │ logo (nhỏ lại) │ khối Trà sát lề phải, thẳng cột với Matcha']},
-  {v:'v1.7.317', ngay:'22/11/2026', nd:['Tài liệu: Menu bản clean thêm khối Trà (demo) ở hàng cuối cạnh Cacao — trà mãng cầu, trà măng cụt, trà lựu; ảnh ly đổi màu theo ảnh mẫu, chưa có giá (ghi Sắp có)']},
-  {v:'v1.7.316', ngay:'22/11/2026', nd:['Tài liệu: Menu ảnh từng món bản 2 xếp lại 8 · 8 · 3 — trái Cà phê 8 ly, phải Phindi rồi Matcha & trà sữa, hàng cuối Cacao + logo; tên món không còn xuống dòng']},
-  {v:'v1.7.315', ngay:'22/11/2026', nd:['Tài liệu: Menu cầm tay đang dùng thêm icon máy / phin (cà phê đen, sữa) và icon hạnh nhân / hạt phỉ như standee, chân menu ghi “mở cửa từ 5:30”', 'Menu bản clean: nền kem như menu cầm tay, xếp Phindi + Matcha & trà sữa lên hàng 2 (2 hàng đầu đều 8 ly), Cacao xuống hàng 3; bản clean và bản 2 thêm icon hạnh nhân / hạt phỉ']},
-  {v:'v1.7.314', ngay:'22/11/2026', nd:['Tài liệu: 2 bản menu cầm tay ảnh từng món thêm icon máy / phin ở dòng giá cà phê đen, cà phê sữa cho dễ phân biệt (bản clean chỉ để icon)']},
-  {v:'v1.7.313', ngay:'22/11/2026', nd:['Tài liệu: thêm Menu cầm tay bản clean (nền kem nhạt, ly nhỏ xếp thoáng, giá chữ trơn, 3 hàng) · sửa vết xoá chữ dưới logo trên ảnh ly matcha latte muối và phindi hạt phỉ (lộ dải mờ hình chữ nhật)']},
-  {v:'v1.7.312', ngay:'22/11/2026', nd:['Tài liệu: Menu cầm tay ảnh từng món bản 2 — toàn nền kem, mọi ly cùng cỡ, 2 cột (Cà phê + Matcha & trà sữa │ Cacao + Phindi + logo, địa chỉ)']},
+  {v:'v1.7.322', ngay:'22/11/2026', nd:['Tài liệu: tạm gỡ Menu cầm tay bản clean (khối Trà demo chưa đạt, chủ nghiên cứu thêm); bản 2 và menu đang dùng có icon vẫn giữ']}
 ];
 /** Còn treo: nhóm · việc (chuỗi hoặc hàm) · cần gì / từ ai · xong() tự kiểm theo dữ liệu (không có thì chỉ xoá tay khỏi danh sách này khi đã giải quyết) · tt() chữ trạng thái */
 const BACKLOG = [
@@ -5670,10 +5661,11 @@ function renderSoTay(){
     muc('5. Đăng ký & đổi ca', '<ul>' + li([
       'Đăng ký trước bằng <code>/dangkyca</code> (bấm nút, hoặc gõ <code>/dangkyca T2 T4 T6</code>), tối đa ' + CS_BOT.tuanToi + ' tuần tới. Ca trống: nhận ngay; ca đã có người: chủ quyết.',
       'Ca hôm nay đã khoá — cần đổi thì báo chủ. Lịch đã xếp xem ở thẻ Lịch làm theo đợt phía trên hoặc <code>/lichca</code>.',
-      '<b>Đổi ca: báo trước 2 ngày.</b> Có 2 kiểu, đều gõ trên bot:',
+      '<b>Đổi ca: báo trước 2 ngày.</b> Có 3 kiểu, đều gõ trên bot:',
       '<b>Nhờ làm thay</b> (người kia không phải đổi lại): <code>/doica 24/11 tên</code> — vd <code>/doica 24/11 Duy</code> = Duy làm ca 24/11 của bạn, bạn không làm bù. Chưa tìm được ai: <code>/doica 24/11</code> nhờ cả quán, ai bấm nhận trước người đó làm.',
-      '<b>Đổi chéo</b> (2 người đổi ca cho nhau): <code>/doica 14/11 tên 24/11</code> — vd <code>/doica 14/11 Duy 24/11</code> = Duy làm ca 14/11 của bạn, bạn làm ca 24/11 của Duy. Ngày đầu là ca <b>của bạn</b>, ngày sau tên là ca <b>của người kia</b>. Hai ca đổi cùng lúc; 1 ca không đổi được thì giữ nguyên cả 2.',
-      '<b>Các bước:</b> người kia bấm ✅ trong tin bot gửi → chủ duyệt → lịch tự đổi, bot báo cả hai. <b>Chưa duyệt thì ca vẫn là của bạn</b> — không đến vẫn tính vắng.',
+      '<b>Đổi chéo</b> (2 người đổi ca cho nhau): <code>/doica 14/11 tên 24/11</code> — vd <code>/doica 14/11 Duy 24/11</code> = Duy làm ca 14/11 của bạn, bạn làm ca 24/11 của Duy. Ngày nào viết trước cũng được, bot tự nhận ca nào của ai. Hai ca đổi cùng lúc; 1 ca không đổi được thì giữ nguyên cả 2.',
+      '<b>Xin ca</b> (bạn <b>không có ca</b> hôm đó, muốn làm ca của người khác): <code>/doica 30/11 tên</code> — vd Duy có ca 30/11, Nga không có: Nga gõ <code>/doica 30/11 Duy</code> = Nga làm ca 30/11 của Duy. Muốn trả lại Duy 1 ca thì gõ đổi chéo: <code>/doica 24/11 Duy 30/11</code>.',
+      '<b>Các bước:</b> người kia bấm ✅ trong tin bot gửi → chủ duyệt → lịch tự đổi, bot báo cả hai. <b>Chưa duyệt thì lịch vẫn như cũ</b> — ca của ai người đó vẫn phải đi, không đến vẫn tính vắng.',
       'Mẹo: ghi lý do ở cuối (<code>/doica 14/11 Duy 24/11 bận thi</code>). Gõ ngày cụ thể (14/11) cho chắc — gõ T2…CN là thứ đó <b>gần nhất</b> tính từ hôm nay. Đã check-in ca hôm nay thì không đổi được, báo chủ. Đổi ý: gõ <code>/doica</code> rồi bấm ↩️ Rút.',
     ]) + '</ul>') +
     muc('6. Bán hàng tại quầy', '<ul>' + li([
