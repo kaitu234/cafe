@@ -895,7 +895,7 @@ html.mcap{background:var(--paper)}
       </div>
     </div>
     <div class="card" id="sec-td-dot">   <!-- v1.7.323 -->
-      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca · mọi đợt, không theo bộ lọc · giống hệt ở tab Hôm nay và Doanh thu thuần</span></div>
+      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· <b data-dottmth></b> · chỉ ngày trong tháng đang xem (đợt vắt 2 tháng tính riêng từng tháng) · cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca</span></div>
       <div class="tblwrap" style="max-height:320px" data-dottm></div>
     </div>
     <div class="g311">
@@ -1010,7 +1010,7 @@ html.mcap{background:var(--paper)}
       <div class="cmt" id="dttCmt"></div>
     </div>
     <div class="card" id="sec-dtt-dot">   <!-- v1.7.323 -->
-      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca · mọi đợt, không theo bộ lọc · giống hệt ở tab Hôm nay và Doanh thu thuần</span></div>
+      <div class="ct">💵 Tiền mặt theo đợt làm việc <span class="nt">· <b data-dottmth></b> · chỉ ngày trong tháng đang xem (đợt vắt 2 tháng tính riêng từng tháng) · cộng tiền mặt các ngày bán liên tiếp của cùng người làm ca</span></div>
       <div class="tblwrap" style="max-height:320px" data-dottm></div>
     </div>
     <div class="card" id="sec-dtt-bang">
@@ -3993,7 +3993,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.356';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.357';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4051,6 +4051,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.357', ngay:'23/11/2026', nd:['💵 Tiền mặt theo đợt làm việc: chỉ hiện tháng đang xem, đợt vắt 2 tháng tính riêng từng tháng']},
   {v:'v1.7.356', ngay:'23/11/2026', nd:['Chip đơn nhiều ly theo cỡ đơn: ✌️ đơn 2 · 🔥 đơn 3 · 🚀 đơn 4 · 👑 đơn 5 trở lên']},
   {v:'v1.7.355', ngay:'23/11/2026', nd:['Chip đơn nhiều ly: sửa icon số chưa hiện']},
   {v:'v1.7.354', ngay:'23/11/2026', nd:['Chip đơn nhiều ly: đổi icon 👥 thành icon số 2️⃣ 3️⃣ 4️⃣ 5️⃣']},
@@ -4489,9 +4490,10 @@ function tuKiem(){
     { const nd = (k, tm, chot = true) => ({k, tt:tm + 50, bot:tm + 50, tm, chot}), NTd = {}; [nd('2026-11-14', 170), nd('2026-11-15', 145), nd('2026-11-17', 244), nd('2026-11-18', 99, false), nd('2026-11-20', 283), nd('2026-11-21', 60), {k:'2026-11-22', tt:0, bot:0, tm:0, chot:false}].forEach(d => { NTd[d.k] = d; });
       const cg = [['2026-11-14', 'Nga'], ['2026-11-15', 'Duy'], ['2026-11-15', 'Chủ'], ['2026-11-17', 'Duy'], ['2026-11-18', 'Duy'], ['2026-11-20', 'Chủ'], ['2026-11-21', 'Nga'], ['2026-11-21', 'Duy']].map(([k, nv]) => ({k, nv}));
       const dm = dotTienMatCore(NTd, cg, [{k:'2026-11-15', nv:'Chủ'}, {k:'2026-11-20', nv:'Nga'}], n => n === 'Chủ'), dmTxt = dm.map(x => `${x.nv} ${x.tu.slice(8)}-${x.den.slice(8)} ${x.tm}/${x.n}`).join(' | ');
+      const dmT = {'2026-10-31':nd('2026-10-31', 70), '2026-11-01':nd('2026-11-01', 80)}, cgT = [{k:'2026-10-31', nv:'Nga'}, {k:'2026-11-01', nv:'Nga'}], dmTh = [undefined, '2026-10', '2026-11'].map(t => dotTienMatCore(dmT, cgT, [], () => false, t).map(x => x.tm).join('+')).join(' ');
       const thuc = dotTienMatCore(nguonTien(), D.cong, D.chot, laChu).reduce((a, x) => a + x.tm, 0), goc = Object.values(nguonTien()).reduce((a, d) => a + (d.chot && (d.tt || d.bot) ? d.tm : 0), 0);
-      ok('Tiền mặt theo đợt làm việc: Duy 15–18/11 gộp 1 đợt (nghỉ bán 16/11 không cắt, 18/11 chưa chốt không cộng, chủ chấm công / chốt hộ không tính), 20/11 không nhân viên chấm công → người chốt, 21/11 hai người → "Duy + Nga"; tổng mọi đợt = tổng tiền mặt các ngày đã chốt',
-        dmTxt === 'Nga 14-14 170/1 | Duy 15-18 389/3 | Nga 20-20 283/1 | Duy + Nga 21-21 60/1' && dm[1].chua.join() === '2026-11-18' && thuc === goc, `${dmTxt} · tổng ${fmt(thuc)} / ${fmt(goc)}`); }
+      ok('Tiền mặt theo đợt làm việc: Duy 15–18/11 gộp 1 đợt (nghỉ bán 16/11 không cắt, 18/11 chưa chốt không cộng, chủ chấm công / chốt hộ không tính), 20/11 không nhân viên chấm công → người chốt, 21/11 hai người → "Duy + Nga"; tổng mọi đợt = tổng tiền mặt các ngày đã chốt; lọc tháng chỉ tính ngày trong tháng (đợt 31/10–01/11 tách 70 + 80)',
+        dmTxt === 'Nga 14-14 170/1 | Duy 15-18 389/3 | Nga 20-20 283/1 | Duy + Nga 21-21 60/1' && dm[1].chua.join() === '2026-11-18' && thuc === goc && dmTh === '150 70 80', `${dmTxt} · tổng ${fmt(thuc)} / ${fmt(goc)}`); }
     // 43. Lịch định lượng cacao theo ngày (mốc mới đứng trước) + đọc tab GoTatHoc theo tên cột
     const dlC = {cc:4.9, ly:1}, dlA = ['2026-10-12', '2026-10-13', '2026-10-15', '2026-10-16'].map(k => ctTheoNgay(dlC, DINH_LUONG_CU, k).cc), gtH = docGoTatHoc([['Cụm gõ', 'Mã món', 'Tên món', 'Học lúc', 'Số lần'], ['den da', 'CDM', 'Cà phê đen máy', '', 3], ['den nong', 'cdm', 'Cà phê đen máy', '', 3], ['', 'bx', '', '', '']]);
     ok('Cacao: ly bán 12/10 tính 10 g · 13/10 và 15/10 tính 7 g · 16/10 tính theo CongThuc (thử với số giả 4,9 g); tab GoTatHoc: 2 cụm của cdm (mã viết hoa vẫn nhận), dòng thiếu cụm bỏ qua, không có tab → rỗng',
@@ -6112,14 +6114,15 @@ function docDtSheet(rv){
 }
 /** v1.7.323 (chủ nhờ 23/11) — tiền mặt theo ĐỢT LÀM VIỆC: các ngày bán liên tiếp cùng người làm ca gộp 1 đợt (ngày nghỉ bán ở giữa không cắt đợt).
  *  Người làm ca = nhân viên có chấm công ngày đó (không tính chủ); không ai chấm công thì người chốt ca, rồi tới chủ. Nhiều nhân viên cùng ngày → "A + B".
- *  Tiền mặt = nguonTien().tm của ngày ĐÃ chốt ca (cùng số bảng doanh thu hằng ngày và tab Doanh thu của Sheet); ngày chưa chốt không cộng, liệt kê riêng. Hàm thuần (bất biến 98). */
-function dotTienMatCore(NT, cong, chot, laChuFn){
+ *  Tiền mặt = nguonTien().tm của ngày ĐÃ chốt ca (cùng số bảng doanh thu hằng ngày và tab Doanh thu của Sheet); ngày chưa chốt không cộng, liệt kê riêng. Hàm thuần (bất biến 98).
+ *  v1.7.357 (chủ nhờ 23/11): th = 'YYYY-MM' → chỉ ngày trong tháng đó, đợt vắt 2 tháng bị cắt ở đầu tháng; bỏ trống = mọi ngày. */
+function dotTienMatCore(NT, cong, chot, laChuFn, th){
   const nvCa = {}, moi = {}, nguoiChot = {};
   cong.forEach(c => { const o = laChuFn(c.nv) ? moi : nvCa; (o[c.k] = o[c.k] || new Set()).add(c.nv); });
   chot.forEach(c => { nguoiChot[c.k] = c.nv; });
   const ai = k => nvCa[k] ? [...nvCa[k]].sort((a, b) => a.localeCompare(b, 'vi')).join(' + ') : nguoiChot[k] || (moi[k] ? [...moi[k]][0] : 'Chưa rõ');
   const out = [];
-  Object.values(NT).filter(d => d.tt || d.bot).sort((a, b) => a.k.localeCompare(b.k)).forEach(d => {
+  Object.values(NT).filter(d => (d.tt || d.bot) && (!th || d.k.slice(0, 7) === th)).sort((a, b) => a.k.localeCompare(b.k)).forEach(d => {
     const nv = ai(d.k); let x = out[out.length - 1];
     if (!x || x.nv !== nv) out.push(x = {nv, tu:d.k, den:d.k, n:0, tm:0, ngay:[], chua:[]});
     x.den = d.k; x.n++;
@@ -6128,11 +6131,16 @@ function dotTienMatCore(NT, cong, chot, laChuFn){
   return out;
 }
 /** Vẽ CÙNG một bảng vào mọi ô [data-dottm] (tab Hôm nay và Doanh thu thuần) → hai nơi luôn giống nhau */
-function veDotTienMat(){
-  const ds = dotTienMatCore(nguonTien(), D.cong, D.chot, laChu).reverse(), T = ds.reduce((a, x) => { a.tm += x.tm; a.n += x.n; return a; }, {tm:0, n:0});
+/* v1.7.357: tháng đang xem — tab Hôm nay theo ô chọn ngày / kỳ riêng của tab, tab khác theo Kỳ xem chung; kỳ vắt 2 tháng lấy tháng của ngày cuối (không quá hôm nay) */
+function thangDotTm(homNay){ const t = today(), k = homNay ? (S.tdKy === 'ngay' ? S.tdK || t : tdKy().den) : S.to || t; return (k > t ? t : k).slice(0, 7); }
+function htmlDotTienMat(th){
+  const ds = dotTienMatCore(nguonTien(), D.cong, D.chot, laChu, th).reverse(), T = ds.reduce((a, x) => { a.tm += x.tm; a.n += x.n; return a; }, {tm:0, n:0});
   const kh = x => x.tu === x.den ? dShort(x.tu) : x.tu.slice(0, 7) === x.den.slice(0, 7) ? `${x.tu.slice(8)}–${dShort(x.den)}` : `${dShort(x.tu)}–${dShort(x.den)}`;
-  const html = `<table><thead><tr><th>Đợt</th><th>Người làm ca</th><th class="r">Ngày bán</th><th class="r">Tiền mặt</th><th>Từng ngày</th></tr></thead><tbody>${ds.length ? ds.map(x => `<tr><td style="white-space:nowrap">${kh(x)}</td><td><b>${esc(x.nv)}</b></td><td class="r num">${x.n}</td><td class="r num"><b>${fmt(x.tm)}</b></td><td class="muted" style="font-size:11.5px">${x.ngay.map(d => `${dShort(d.k)}: ${fmt(d.tm)}`).join(' · ')}${x.chua.length ? ` <span class="pill warn">chưa chốt ${x.chua.map(dShort).join(', ')}</span>` : ''}</td></tr>`).join('') : '<tr><td colspan="5" class="muted" style="text-align:center;padding:14px">Chưa có ngày bán.</td></tr>'}</tbody>${ds.length ? `<tfoot><tr><td>Tổng</td><td></td><td class="r num">${T.n}</td><td class="r num">${fmt(T.tm)}</td><td></td></tr></tfoot>` : ''}</table>`;
-  document.querySelectorAll('[data-dottm]').forEach(el => { el.innerHTML = html; });
+  return `<table><thead><tr><th>Đợt</th><th>Người làm ca</th><th class="r">Ngày bán</th><th class="r">Tiền mặt</th><th>Từng ngày</th></tr></thead><tbody>${ds.length ? ds.map(x => `<tr><td style="white-space:nowrap">${kh(x)}</td><td><b>${esc(x.nv)}</b></td><td class="r num">${x.n}</td><td class="r num"><b>${fmt(x.tm)}</b></td><td class="muted" style="font-size:11.5px">${x.ngay.map(d => `${dShort(d.k)}: ${fmt(d.tm)}`).join(' · ')}${x.chua.length ? ` <span class="pill warn">chưa chốt ${x.chua.map(dShort).join(', ')}</span>` : ''}</td></tr>`).join('') : '<tr><td colspan="5" class="muted" style="text-align:center;padding:14px">Chưa có ngày bán trong tháng.</td></tr>'}</tbody>${ds.length ? `<tfoot><tr><td>Tổng</td><td></td><td class="r num">${T.n}</td><td class="r num">${fmt(T.tm)}</td><td></td></tr></tfoot>` : ''}</table>`;
+}
+function veDotTienMat(){
+  ['sec-td-dot', 'sec-dtt-dot'].forEach(id => { const c = $(id); if (!c) return; const th = thangDotTm(id === 'sec-td-dot');
+    c.querySelector('[data-dottm]').innerHTML = htmlDotTienMat(th); c.querySelector('[data-dottmth]').textContent = mlabel(th); });
 }
 function renderDtt(){
   veDotTienMat();
