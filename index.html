@@ -24,7 +24,7 @@
   --bg:#F6EFE3; --paper:#EBDCC3; --surface:#FFFFFF; --surface-2:#F6EFE3; --ink:#5E3B25; --muted:#8A6B55; --line:#E2D2BA;
   --brand:#5E3B25; --brand-ink:#FFFFFF; --beige:#EBDCC3; --caramel:#B7793A;
   --s1:#5E3B25; --s2:#00809C; --s3:#B7793A; --ghost:#C9B49A;
-  --lx:#12408F; --lx-bg:#E7EEFA; --good:#2F7A4B; --good-bg:#DDEFE2; --warn:#9A6A10; --warn-bg:#F6E8C7; --bad:#B23A2E; --bad-bg:#F7DEDA;
+  --lx:#0F6B34; --lx-bg:#DDF1E3; --good:#2F7A4B; --good-bg:#DDEFE2; --warn:#9A6A10; --warn-bg:#F6E8C7; --bad:#B23A2E; --bad-bg:#F7DEDA;
   --heat:94,59,37;
   --f-display:'Barlow Condensed','Arial Narrow',sans-serif;
   --f-body:'Be Vietnam Pro','Segoe UI',system-ui,sans-serif;
@@ -38,13 +38,13 @@
   --bg:#17100B; --surface:#241911; --surface-2:#2C2016; --ink:#F2E6D5; --muted:#B39E89; --line:#3D2E22;
   --brand:#E3C39A; --brand-ink:#241911; --beige:#3A2B1E; --caramel:#D49B5C;
   --s1:#C97A45; --s2:#2A9DB5; --s3:#B88A22; --ghost:#A08B76;
-  --lx:#8DB9F7; --lx-bg:#16233A; --good:#7DCB98; --good-bg:#17301F; --warn:#E3B95B; --warn-bg:#3A2E14; --bad:#F08A7C; --bad-bg:#3B1F1A;
+  --lx:#7FDB9F; --lx-bg:#15331F; --good:#7DCB98; --good-bg:#17301F; --warn:#E3B95B; --warn-bg:#3A2E14; --bad:#F08A7C; --bad-bg:#3B1F1A;
   --heat:201,122,69; --panel:#0F0A06; --panel-line:#3D2E22; --panel-mute:#B39E89; --paper:#2C2016; --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c-khac:#6F5D4D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#17100B; --surface:#241911; --surface-2:#2C2016; --ink:#F2E6D5; --muted:#B39E89; --line:#3D2E22;
   --brand:#E3C39A; --brand-ink:#241911; --beige:#3A2B1E; --caramel:#D49B5C;
   --s1:#C97A45; --s2:#2A9DB5; --s3:#B88A22; --ghost:#A08B76;
-  --lx:#8DB9F7; --lx-bg:#16233A; --good:#7DCB98; --good-bg:#17301F; --warn:#E3B95B; --warn-bg:#3A2E14; --bad:#F08A7C; --bad-bg:#3B1F1A;
+  --lx:#7FDB9F; --lx-bg:#15331F; --good:#7DCB98; --good-bg:#17301F; --warn:#E3B95B; --warn-bg:#3A2E14; --bad:#F08A7C; --bad-bg:#3B1F1A;
   --heat:201,122,69; --panel:#0F0A06; --panel-line:#3D2E22; --panel-mute:#B39E89; --paper:#2C2016; --c1:#3987e5; --c2:#d95926; --c3:#199e70; --c4:#c98500; --c5:#d55181; --c-khac:#6F5D4D; --shadow:0 1px 2px rgba(0,0,0,.3); color-scheme:dark}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -150,7 +150,7 @@ details.guide p{margin:4px 0;max-width:110ch}
 .kpi.tgt:has(.v.dn){background:var(--bad-bg);border-color:#EBB8B0;border-left-color:var(--bad)}
 .kpi.tgt:has(.v.dn) .lb{color:var(--bad)}
 .kpi.main:has(.v.dn){border-left-color:#F08A7C}
-.kpi.main .v.up{color:#A9CDFF} .kpi.main .v.dn{color:#FFB4A8}
+.kpi.main .v.up{color:#9FE8B8} .kpi.main .v.dn{color:#FFB4A8}
 .kpi .lb .ki{display:inline-grid;place-items:center;width:24px;height:24px;margin-right:7px;border-radius:7px;background:rgba(193,140,82,.16);font-size:14px;line-height:1;letter-spacing:0;text-transform:none;vertical-align:middle}
 .lapp{width:16px;height:16px;border-radius:4px;vertical-align:-3px;margin-right:4px;object-fit:cover}.lapp-w{width:38px}
 .kpi .lb .ki.ki-app{width:auto;padding:0 3px;gap:3px;display:inline-flex;align-items:center;background:#fff}.ki-app .lapp{margin:0;width:18px;height:18px}.ki-app .lapp-w{width:43px}
@@ -167,7 +167,7 @@ details.guide p{margin:4px 0;max-width:110ch}
 .kpi .s{font-size:11.5px;opacity:.85}
 .dl{font-weight:700;font-size:11.5px}
 .dl.up{color:var(--lx)} .dl.dn{color:var(--bad)}
-.kpi.main .dl.up{color:#A9CDFF} .kpi.main .dl.dn{color:#FFC2B8}
+.kpi.main .dl.up{color:#9FE8B8} .kpi.main .dl.dn{color:#FFC2B8}
 /* v1.7.138: thẻ chính nay nền nâu đậm ở cả 2 chế độ → bỏ màu đậm riêng của chế độ Tối (v1.7.42 T-22), dùng .kpi.main .v.up/.dn sáng */
 th .muted{color:inherit;opacity:.75}   /* v1.7.42 (Fable 5 T-22): chữ mờ trong tiêu đề bảng (vd "(cần 2)") lấy màu tiêu đề thay vì --muted (quá mờ trên nền be ở chế độ Tối) */
 .kbar{display:inline-block;width:96px;height:10px;border-radius:3px;background:var(--line);vertical-align:middle;overflow:hidden}.kbar i{display:block;height:100%;background:var(--good)}.kbar i.warn{background:var(--warn)}.kbar i.bad{background:var(--bad)}
@@ -221,14 +221,14 @@ tfoot td{position:sticky;bottom:0;background:var(--surface);font-weight:700;bord
 .dbtn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-right:6px;border:1px solid var(--line);border-radius:3px;background:var(--surface);cursor:pointer;font-size:12px;line-height:1;padding:0}
 .pill{display:inline-block;font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:99px;white-space:nowrap}
 .pill.good{background:var(--good-bg);color:var(--good)} .pill.warn{background:var(--warn-bg);color:var(--warn)} .pill.bad{background:var(--bad-bg);color:var(--bad)} .pill.neu{background:var(--beige);color:var(--ink)}
-/* v1.7.349 (chủ 23/11): lãi, dòng tiền, tăng / đạt = xanh dương đậm; ô % dương có ▲ (lxp); âm vẫn đỏ (lxn) */
+/* v1.7.349 (chủ 23/11): lãi, dòng tiền, tăng / đạt = xanh lá đậm; ô % dương có ▲ (lxp); âm vẫn đỏ (lxn) */
 .up,.lx,.lxp{color:var(--lx);font-weight:700} .dn{color:var(--bad)} .lxn{font-weight:700}
 .lxp::before{content:'▲';font-size:.7em;margin-right:4px;vertical-align:1px}
 td.lx,td.lxp{background:var(--lx-bg)} td.lxn{background:var(--bad-bg)}
 tfoot td{background:var(--surface-2);font-size:1.06em} tfoot td.lx,tfoot td.lxp{background:var(--lx-bg)} tfoot td.lxn{background:var(--bad-bg)}
 #tPnl tr.tot td,#tKqThang tr:has(b) td{font-size:1.08em} #tPnl tr.tot td.lxn,#tPnl tr.tot td.lx,#tPnl tr.tot td.lxp{font-weight:800}
 .kpi.tgt:has(.v.up),.kpi.tgt:has(.v.lx){background:var(--lx-bg);border-left-color:var(--lx)}
-.kpi.main .lx,.kpi.main .lxp,.pk .lx,.pk .lxp{color:#A9CDFF} .kpi.main .lxn,.pk .lxn{color:#FFB4A8}
+.kpi.main .lx,.kpi.main .lxp,.pk .lx,.pk .lxp{color:#9FE8B8} .kpi.main .lxn,.pk .lxn{color:#FFB4A8}
 .bar-in{display:inline-block;height:6px;border-radius:3px;background:var(--s1);vertical-align:middle;margin-left:6px;opacity:.75}
 
 /* ---------- finance / alerts ---------- */
@@ -322,7 +322,7 @@ body.focus-on{overflow:hidden}
 .pk .vl{font-family:var(--f-display);font-weight:700;font-size:clamp(19px,1.9vw,26px);letter-spacing:.02em;color:#fff;line-height:1.15;margin:3px 0 2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pk.hot .vl{color:#E3C39A}
 .pk .s1{font-family:var(--f-mono);font-size:10.5px;color:var(--panel-mute);line-height:1.5}
-.pk .up{color:#A9CDFF}.pk .dn{color:#FF9C8E}
+.pk .up{color:#9FE8B8}.pk .dn{color:#FF9C8E}
 .km{border:1px solid var(--line);border-left:4px solid var(--caramel);border-radius:0 8px 8px 0;padding:8px 12px;display:flex;gap:12px;align-items:baseline;background:var(--surface)}
 .km .t{font-family:var(--f-display);font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--caramel);flex:0 0 92px}
 .km p{margin:0;font-size:12.5px}
@@ -2483,7 +2483,7 @@ const barStyle = c => ({backgroundColor:c, borderRadius:{topLeft:4, topRight:4},
 
 /* ============ generic sortable table ============ */
 /* cols: {k,l,r?,f?,heat?,cls?(row)} · rows: objects · opts: {id, total, onRow, rowKey, selKey, child(row)->rows, sortDefault} */
-/** v1.7.349 — lớp màu lãi / dòng tiền: âm đỏ, dương xanh dương đậm; lxPct = thêm ▲ cho ô %. table() áp 2 lớp này cho cả dòng Tổng. Hàm thuần */
+/** v1.7.349 — lớp màu lãi / dòng tiền: âm đỏ, dương xanh lá đậm; lxPct = thêm ▲ cho ô %. table() áp 2 lớp này cho cả dòng Tổng. Hàm thuần */
 const lxSo = v => v == null ? '' : v < 0 ? 'dn lxn' : v > 0 ? 'lx' : '', lxPct = v => v == null ? '' : v < 0 ? 'dn lxn' : v > 0 ? 'lxp' : '';
 function table(opts){
   const st = S.sort[opts.id] || opts.sortDefault || {k:(opts.cols[1] || opts.cols[0]).k, d:-1};   // v1.7.41 (Fable 5 C-02): bảng 1 cột không văng lỗi
@@ -3991,7 +3991,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.349';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.350';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4049,6 +4049,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.350', ngay:'23/11/2026', nd:['Lãi, dòng tiền dương: đổi từ xanh dương sang xanh lá đậm (nền xanh lá nhạt), ▲ giữ nguyên']},
   {v:'v1.7.349', ngay:'23/11/2026', nd:['Lãi, dòng tiền, tiền cuối tháng dương: xanh dương đậm trên nền xanh nhạt ở mọi bảng, thẻ, biểu đồ lãi; âm: đỏ trên nền đỏ nhạt', 'Ô % dương (biên, % thu hồi vốn, %Đạt từ 100%) có mũi tên ▲; số tăng / đạt toàn dashboard đổi từ xanh lá sang xanh dương đậm', 'Dòng Tổng tô màu theo lãi và to hơn']},
   {v:'v1.7.348', ngay:'23/11/2026', nd:['Bao bì phụ (giấy chống tràn, hũ xốt, túi PE ly 168.977) và khăn giấy (139.620) phân bổ 3 tháng T11–T1/2027 thay vì trừ hết khi mua; tiền đã trả không đổi', 'PNL: dòng bao bì phụ phân bổ chia theo ngày khi xem lẻ ngày / tuần']},
   {v:'v1.7.347', ngay:'23/11/2026', nd:['Lãi vận hành khớp Sheet Tổng hợp: cộng chênh két sau chốt ca; xem trọn tháng thì trừ đủ khoản cả tháng (xem lẻ ngày / tuần vẫn chia theo ngày) — áp cho PNL, Hôm nay, Báo cáo, Kế hoạch', 'Kỳ xem Tất cả: tính cả chi phí trước ngày mở bán của tháng 10']},
