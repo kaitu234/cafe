@@ -1368,7 +1368,7 @@ html.mcap{background:var(--paper)}
         <label class="field"><span class="lbl">Giá bán TB (đ)</span><input id="plGia" type="number" inputmode="numeric" step="500"></label>
         <label class="field"><span class="lbl">Giá vốn / ly (đ)</span><input id="plCogs" type="number" inputmode="numeric" step="50"></label>
         <label class="field"><span class="lbl">Lương / ngày (đ)</span><input id="plLuong" type="number" inputmode="numeric" step="10000"></label>
-        <label class="field"><span class="lbl">Chi cố định / tháng từ T1/2027 (đ)</span><input id="plCd" type="number" inputmode="numeric" step="250000"></label>
+        <label class="field"><span class="lbl">Chi cố định / tháng từ T2/2027 (đ)</span><input id="plCd" type="number" inputmode="numeric" step="250000"></label>
         <label class="field"><span class="lbl">Biên gộp mục tiêu (%)</span><input id="plBien" type="number" inputmode="numeric" step="5"></label>
         <label class="field"><span class="lbl">&nbsp;</span><button class="lnk" id="plReset" type="button">↺ Về số thật</button></label>
       </div>
@@ -1892,10 +1892,10 @@ function parseWorkbook(wb){
     });
   });
   D.months.sort();
-  // v1.7.61 — tab "Chi cố định" (chủ quán 18/10): Khoản chi · Hạng mục sổ chi · Số tiền / tháng · Áp dụng từ tháng · Đến tháng (trống = còn) · Ghi chú. Không có tab → dùng mặc định cũ (thuê + điện nước 2.000.000 đ từ T1/2027)
+  // v1.7.61 — tab "Chi cố định" (chủ quán 18/10): Khoản chi · Hạng mục sổ chi · Số tiền / tháng · Áp dụng từ tháng · Đến tháng (trống = còn) · Ghi chú. Không có tab → dùng mặc định cũ (thuê + điện nước 2.000.000 đ từ T2/2027)
   { const rr = rowsOf(wb, 'Chi cố định'), h = rr.findIndex(r => /^Khoản chi$/i.test(txt(r[0]))), thg = v => { const k = dayKey(v); if (k) return k.slice(0, 7); const m = /^(\d{1,2})\/(\d{4})$/.exec(txt(v)) || /^(\d{4})-(\d{2})$/.exec(txt(v)); return !m ? '' : m[2].length === 4 ? `${m[2]}-${p2(m[1])}` : `${m[1]}-${m[2]}`; };
     D.coDinh = []; if (h >= 0) for (const r of rr.slice(h + 1)){ if (!txt(r[0])) break; const tu = thg(r[3]); if (num(r[2]) > 0 && tu) D.coDinh.push({ten:txt(r[0]), cat:txt(r[1]).normalize('NFC'), tien:num(r[2]), tu, den:thg(r[4]), note:txt(r[5])}); }
-    D.coDinhTab = h >= 0; if (h < 0) D.coDinh = [{ten:'Thuê vị trí + điện nước', cat:'Thuê vị trí / mặt bằng', tien:CHI_CO_DINH_THANG, tu:'2027-01', den:'', note:'mặc định (chưa có tab Chi cố định)'}]; }
+    D.coDinhTab = h >= 0; if (h < 0) D.coDinh = [{ten:'Thuê vị trí + điện nước', cat:'Thuê vị trí / mặt bằng', tien:CHI_CO_DINH_THANG, tu:'2027-02', den:'', note:'mặc định (chưa có tab Chi cố định)'}]; }
   // v1.7.61 — tab "Thiết bị" phần 1: combo xe quầy Hương Cao Nguyên (Nhóm · STT · Tên · Quy cách · ĐVT · SL · Đã giao · Ghi chú phiếu · Tình trạng). Phần 2 (mua thêm) đọc thẳng sổ chi hạng mục Trang thiết bị
   { const rr = rowsOf(wb, 'Thiết bị'), h = rr.findIndex(r => /^Nhóm$/i.test(txt(r[0])) && /Tên/i.test(txt(r[2]))); D.thietBi = [];
     if (h >= 0) for (const r of rr.slice(h + 1)){ if (!txt(r[2])) break; D.thietBi.push({nhom:txt(r[0]), stt:num(r[1]), ten:txt(r[2]), qc:txt(r[3]), dvt:txt(r[4]), sl:num(r[5]), giao:txt(r[6]), ghi:txt(r[7]), tt:txt(r[8])}); }
@@ -3457,7 +3457,7 @@ const laHdCu = r => /(^|[^a-z])((hd|hoa don) cu|khong con dung)([^a-z]|$)/.test(
 /** v1.7.82 (chủ quán chốt 26/10, cùng bot khonggia-v1 + Sheet): chú thích có "KHÔNG TÍNH GIÁ" = hàng bàn giao (vd cacao hũ cũ HCN, 2 chai đường) — vẫn cộng SỐ LƯỢNG vào tồn / hao hụt như dòng mua, nhưng KHÔNG vào giá mua */
 const laKhongGia = r => /(^|[^a-z])khong tinh gia([^a-z]|$)/.test(boDau((r.note || '') + ' ' + (r.desc || '')));
 const BAO_BI = new Set(['ly', 'ong', 'tui']);   // mã nguyên liệu tab Kho thuộc nhóm bao bì
-const THANG_MIEN_PHI_DEN = '2026-12';           // chi cố định (thuê chỗ, điện nước) miễn phí tới hết T12/2026
+const THANG_MIEN_PHI_DEN = '2027-01';           // chi cố định (thuê chỗ, điện nước) miễn phí tới hết T01/2027 (chủ gia hạn 23/11/2026; trước là T12/2026) — khớp cột "Áp dụng từ tháng" tab Chi cố định
 const ngayTrongThang = m => new Date(+m.slice(0, 4), +m.slice(5, 7), 0).getDate();
 /** Khấu hao khoản nhượng quyền chia đều theo NGÀY: tháng khấu hao thứ i (0…thang−1 kể từ KHAU_HAO.tu) chịu tong/thang, rải đều các ngày trong tháng */
 /** v1.7.58 — Thu hồi vốn đầu tư (chủ quán 18/10): đầu tư = Σ sổ chi khối Đầu tư (phí nhượng quyền, cọc, trang thiết bị, vận hành hệ thống…);
@@ -3508,7 +3508,7 @@ function renderChiVanHanh(){
     const khac = ghi.filter(r => !laChiCoDinh(r)), khacTien = khac.reduce((t, r) => t + r.amt, 0), cdTien = cd.reduce((t, x) => t + (x.so || x.tam), 0);
     return {m, cd:cdTien, cdTxt:cd.map(x => `${esc(x.k.ten)} ${fmt(x.so || x.tam)}${x.so ? '' : ' <span class="pill neu">tạm tính</span>'}`).join('<br>') || '<span class="muted">—</span>',
       khac:khacTien, khacTxt:khac.map(r => `${esc(r.desc)} ${fmt(r.amt)}`).join(' · '), tong:cdTien + khacTien, mien: m <= THANG_MIEN_PHI_DEN}; });
-  table({id:'tChiVh', rows, sortDefault:{k:'m', d:-1}, cols:[{k:'m', l:'Tháng', f:v => mlabel(v)}, {k:'cdTxt', l:'Khoản cố định', f:(v, r) => v + (r.mien ? '<br><span class="muted">thuê vị trí + điện nước miễn tới hết T12/2026</span>' : '')}, {k:'cd', l:'Cố định', r:1, f:fmt},
+  table({id:'tChiVh', rows, sortDefault:{k:'m', d:-1}, cols:[{k:'m', l:'Tháng', f:v => mlabel(v)}, {k:'cdTxt', l:'Khoản cố định', f:(v, r) => v + (r.mien ? '<br><span class="muted">thuê vị trí + điện nước miễn tới hết T1/2027</span>' : '')}, {k:'cd', l:'Cố định', r:1, f:fmt},
     {k:'khac', l:'Chi vận hành khác (sổ chi)', r:1, f:(v, r) => fmt(v) + (r.khacTxt ? `<br><span class="muted" style="font-size:11.5px">${r.khacTxt}</span>` : '')}, {k:'tong', l:'Tổng / tháng', r:1, f:v => `<b>${fmt(v)}</b>`}]});
   $('chiVhNote').innerHTML = `Khoản cố định đọc từ tab <b>Chi cố định</b>${D.coDinhTab ? '' : ' <span class="pill warn">API chưa gửi tab — đang dùng mặc định</span>'}: ${(D.coDinh || []).map(x => `${esc(x.ten)} ${fmt(x.tien)} đ/tháng từ ${mlabel(x.tu)}${x.den ? ' đến ' + mlabel(x.den) : ''}`).join(' · ')}. Tháng nào sổ chi đã ghi khoản đó (cùng hạng mục) thì lấy số thật, chưa ghi thì tạm tính đủ tháng (PNL tạm tính theo số ngày đã qua). Lương không nằm ở đây.`;
 }
@@ -3670,7 +3670,7 @@ function renderPnl(){
     {l:'Lương nhân viên + chủ', v:-P.luong, k:'sub'},
     ...Object.entries(P.vh).filter(([, v]) => v).map(([c, v]) => ({l:c, v:-v, k:'sub'})),
     P.coDinhUoc ? {l:`Chi cố định chưa ghi sổ, tạm tính (${Object.keys(P.coDinhTam).join(', ')})`, v:-P.coDinhUoc, k:'sub'} : null,
-    P.mienPhi ? {l:'Thuê chỗ + điện nước (miễn phí 3 tháng đầu)', v:0, k:'sub'} : null,
+    P.mienPhi ? {l:'Thuê chỗ + điện nước (miễn phí tới hết T1/2027)', v:0, k:'sub'} : null,
     {l:'Lãi vận hành', v:P.laiVH, k:'tot', lai:true},
   ].filter(Boolean);
   const so = v => (v < 0 ? '−' : '') + fmt(Math.abs(v));
@@ -3870,7 +3870,7 @@ function taoDeXuat(B, par, mua, nsGio, pl){
   if (ngayKiem == null || ngayKiem > 2) R.push({pr:2, t:ngayKiem == null ? 'Chưa kiểm xe lần nào' : `Đã ${ngayKiem} ngày chưa kiểm xe`, ev:'Tồn xe lấy từ lần đếm gần nhất nên càng lâu không đếm càng lệch so với số ly đã bán; hao hụt thật cũng chưa đo được.',
     ac:'Nhân viên gõ /kiemxe ly … cf … cuối ngày và /laykho mỗi lần lấy hàng từ kho ra xe; chủ gõ /kiemkho mỗi tuần. Hao hụt thật sẽ hiện ở tab Kho và Kiểm chứng.'});
   const free = (THANG_MIEN_PHI_DEN < mkey(B.tk)) ? 0 : 1, gm = par.gia - par.cogs;
-  if (free && gm > 0) R.push({pr:3, t:`Từ T1/2027 có chi cố định ${fmtM(par.cd)}/tháng`, ev:'Thuê chỗ + điện nước miễn phí tới hết T12/2026.', ac:`Điểm hoà vốn tăng thêm ~${fmt(Math.ceil(par.cd / (30 * gm)))} ly/ngày. Dùng 3 tháng miễn phí để lên được lượng khách ổn định.`});
+  if (free && gm > 0) R.push({pr:3, t:`Từ T2/2027 có chi cố định ${fmtM(par.cd)}/tháng`, ev:'Thuê chỗ + điện nước miễn phí tới hết T1/2027.', ac:`Điểm hoà vốn tăng thêm ~${fmt(Math.ceil(par.cd / (30 * gm)))} ly/ngày. Dùng 4 tháng miễn phí để lên được lượng khách ổn định.`});
   R.push({pr:3, t:'Hàng cho kèm từ T11: tính theo kho thực', ev:'T10/2026 đã bỏ qua (vận hành hệ thống + hàng cho kèm mua trước khi bán).', ac:'Đếm ly trà đá / trà sâm dứa còn lại đầu tháng và cuối tháng; chênh lệch = tiêu hao thật, nhập vào PNL từ T11.'});
   return R.sort((a, b) => a.pr - b.pr || (b.imp || 0) - (a.imp || 0));
 }
@@ -3934,7 +3934,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.342';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.343';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3976,14 +3976,14 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Biên gộp', 'Lãi gộp ÷ doanh thu', '', 'PNL, Kế hoạch'],
   ['Lương', 'Tiền công bot tính (căn bản + thâm niên + phụ cấp dậy sớm 10k/ca (BỎ từ ca 25/10/2026) + phụ cấp ca 1 người 25k/ca do chủ tick; chủ chỉ căn bản; không còn thưởng theo số ly) + thưởng − phạt chủ ghi bằng /thuong /phat (tab ThuongPhat, theo ngày, chỉ người có ca). Thưởng chuyên cần tính riêng ở bảng lương của bot (BangLuong cột "Chuyên cần", /luong, /canhan) và hiện ở cột Chuyên cần của bảng Nhân viên trong kỳ. Ca chưa checkout: tạm tính tới giờ hiện tại. Tháng nào sổ chi đã ghi khối Nhân sự thì lấy tổng sổ chi phân bổ về từng ngày theo tỉ lệ lương bot của ngày (không có bot thì chia đều), nên kỳ con cộng lại = tổng tháng. Lương/ngày TB (kế hoạch) = Σ tiền công các ngày có bán ÷ số ngày có bán', 'ChamCong · sổ chi', 'PNL, Thu chi, Kế hoạch'],
   ['Hàng cho kèm', 'Ly trà đá, ly pha trà/bọc đá, trà sâm dứa: tính riêng theo tiền chi thực tế, không hao hụt, trừ đúng 1 lần ở cả PNL và Thu chi. T10/2026 bỏ qua; từ T11 tính theo kho thực', 'Sổ chi', 'PNL, Thu chi'],
-  ['Chi vận hành khác', 'Sổ chi khối Vận hành (trừ phí NQ, hàng cho kèm). T10/2026 bỏ qua marketing và vận hành hệ thống. Thuê chỗ + điện nước: miễn phí tới T12/2026, từ T1/2027 tạm 2.000.000 đ/tháng nếu sổ chi chưa ghi', 'Sổ chi', 'PNL'],
+  ['Chi vận hành khác', 'Sổ chi khối Vận hành (trừ phí NQ, hàng cho kèm). T10/2026 bỏ qua marketing và vận hành hệ thống. Thuê chỗ + điện nước: miễn phí tới hết T1/2027, từ T2/2027 tạm 2.000.000 đ/tháng nếu sổ chi chưa ghi', 'Sổ chi', 'PNL'],
   ['Lãi vận hành', 'Lãi gộp − hàng cho kèm − lương − chi vận hành khác', '', 'PNL, Thu chi'],
   ['Khấu hao', 'Không còn trừ vào lãi (chủ quán chốt 18/10/2026). Hằng KHAU_HAO chỉ còn để tham khảo', 'Chủ chốt 18/10', '—'],
   ['Lãi', 'Lãi vận hành; KHÔNG trừ khấu hao (chủ quán chốt 18/10/2026)', 'Chủ chốt 18/10', 'Mọi tab'],
   ['Thu hồi vốn đầu tư', 'Đầu tư = Σ sổ chi khối Đầu tư (nhượng quyền, cọc, trang thiết bị…); đã bù = lãi Thu chi cộng dồn từ khi mở bán; dự kiến hoàn vốn = phần còn lại ÷ lãi TB / ngày của 14 ngày gần nhất', 'Chủ chốt 18/10', 'Thu chi, Tổng quan, PNL'],
   ['Chi phí chung (phân bổ)', '(Hàng cho kèm + lương + chi vận hành) × ly của món ÷ tổng ly. Chỉ là cách chia để so món, không phải chi phí riêng của món', '', 'PNL theo món'],
   ['Khuyến mãi cho đi', 'Σ (giá menu − giá thực bán) × ly, chỉ tính khi giá thực bán thấp hơn giá menu', 'Đơn bot · Menu', 'PNL'],
-  ['Hoà vốn (ly/ngày)', 'Một hàm chung, 2 mức: vận hành = (lương/ngày × 30 + chi vận hành khác + chi cố định) ÷ (30 × (giá − giá vốn/ly)); lương/ngày = TB các ngày bán của tháng, gồm chuyên cần + thưởng, KHÔNG tính chủ (đầu tháng chưa đủ 7 ngày: 14 ngày gần nhất); v1.7.58: chỉ còn 1 mốc (không cộng khấu hao). Tính ở giá đang bán thực (TB 7 ngày gần nhất) và ở giá thường; chi cố định = 0 tới hết T12/2026, khấu hao chỉ 6 tháng đầu; giá vốn/ly làm tròn đồng', '', 'Tổng quan, Bán hàng, PNL, Kế hoạch, Thu chi'],
+  ['Hoà vốn (ly/ngày)', 'Một hàm chung, 2 mức: vận hành = (lương/ngày × 30 + chi vận hành khác + chi cố định) ÷ (30 × (giá − giá vốn/ly)); lương/ngày = TB các ngày bán của tháng, gồm chuyên cần + thưởng, KHÔNG tính chủ (đầu tháng chưa đủ 7 ngày: 14 ngày gần nhất); v1.7.58: chỉ còn 1 mốc (không cộng khấu hao). Tính ở giá đang bán thực (TB 7 ngày gần nhất) và ở giá thường; chi cố định = 0 tới hết T1/2027, khấu hao chỉ 6 tháng đầu; giá vốn/ly làm tròn đồng', '', 'Tổng quan, Bán hàng, PNL, Kế hoạch, Thu chi'],
   ['Hoàn vốn góp', 'Tháng đầu tiên có lãi vận hành lũy kế ≥ vốn góp (số thực tới hôm nay + dự phóng)', 'Vốn & Thu', 'Kế hoạch'],
   ['Đủ ~ngày', 'Tồn (lấy từ số đếm, cùng quy tắc bot, KHÔNG trừ hao theo công thức) ÷ nhịp dùng 7 ngày gần nhất. Tồn = xe + kho (xe: /kiemxe + /laykho; kho: /kiemkho + mua − /laykho, chưa đếm kho thì số nhập − hàng đã ra xe); thiếu số một nơi thì chưa có tổng. Số bot (tab Kho) chỉ hiện để đối chiếu', 'Kho · sổ chi · DonHang · KiemKho · LayKho', 'Kho, Tổng quan, Thu chi, Kế hoạch'],
   ['Chuyên cần', 'Quy tắc nhân sự (bot chốt 12/10/2026): đủ 7 ca liên tiếp của một người check-in ≤ 05:30 → thưởng 50.000 đ rồi đếm lại; ngày không có lịch không đứt chuỗi; check-in sau 05:30 hoặc vắng ca đã nhận → về 0 (ca đi trễ mà chủ tick "Cho bù chuyên cần" ở ChamCong cột T thì vẫn tính đúng giờ); từ 16/10/2026 mỗi tháng được muộn tối đa 3 lần, mỗi lần ≤ 10 phút (check-in đến 05:40) mà không đứt chuỗi; chủ quán không tính. Dashboard tính lại từ chấm công + lịch làm, cùng thuật toán bot', 'ChamCong · DangKyCa', 'Nhân sự'],
@@ -3992,6 +3992,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.343', ngay:'23/11/2026', nd:['Mặt bằng miễn phí thêm T1/2027: thuê chỗ + điện nước 2.000.000 đ/tháng tính từ T2/2027 (trước T1/2027) ở lãi lỗ, Kế hoạch, dự phóng 12 tháng, hoà vốn; khớp tab Chi cố định']},
   {v:'v1.7.342', ngay:'23/11/2026', nd:['Hoà vốn · Kế hoạch: lương/ngày chỉ lấy tháng này và không tính chủ (trước lấy từ ngày mở bán nên lẫn lương chủ và ca 2–3 người của T10); gồm cả chuyên cần + thưởng; thẻ ghi rõ cách ra số lương']},
   {v:'v1.7.341', ngay:'23/11/2026', nd:['Tab Doanh thu (Sheet) bỏ 2 cột Trích tiền mặt · Đã chuyển TM; thêm cột Đã chuyển tiền app vào quỹ CK — tick ngày nào thì tiền app ngày đó cộng vào quỹ CK', 'Thu chi: thẻ 🛵 App hiện phần chưa vào quỹ, tách be / Xanh SM']},
   {v:'v1.7.340', ngay:'23/11/2026', nd:['Hiệu suất: khi cuộn chỉ ghim 6 ô số chính, không còn che biểu đồ; % size L của khung dưới 5 ly để trống']},
@@ -4024,7 +4025,7 @@ const BACKLOG = [
     can:'Chủ chốt 14/11: tính vào PNL (dòng Hàng cho kèm & bao bì phụ) theo tiền mua — v1.7.280', xong:() => true},
   {nhom:'Chờ chủ quán', viec:'P-24: món có công thức nhưng thiếu giá 1 nguyên liệu → tính phần còn lại và báo "Thiếu giá mua" (không thay bằng giá vốn/ly bình quân)', can:'Giữ cách này (14/11). Hiện không nguyên liệu nào thiếu giá — mọi nguyên liệu trong công thức đã có dòng mua có tiền', xong:() => true},
   {nhom:'Chờ đủ dữ liệu', viec:'Hàng cho kèm (ly trà, trà sâm dứa, bịch trà) tính theo kho thực từ T11/2026 — đã tính tự động từ v1.7.280: dùng = tồn (xe + kho) lần đếm xe đầu tháng + mua − tồn lần đếm xe mới nhất', can:'Nhân viên /kiemxe đếm cả ly trà + bịch trà ở xe (ít nhất đầu và cuối tháng), chủ /kiemkho ở kho', xong:() => !choKemKhoKy(THANG_KHO_KEM + '-01', today()).thieu.length, tt:() => choKemKhoKy(THANG_KHO_KEM + '-01', today()).thieu.join(' · ')},
-  {nhom:'Chờ đủ dữ liệu', viec:'Chi cố định thật (thuê chỗ + điện nước) từ T1/2027 thay cho ước tính 2.000.000 đ/tháng', can:'Chủ quán ghi sổ chi hạng mục Thuê vị trí / Điện, nước', xong:() => false, tt:() => today() >= '2027-01-01' ? 'đến hạn' : 'chờ tới 01/01/2027'},
+  {nhom:'Chờ đủ dữ liệu', viec:'Chi cố định thật (thuê chỗ + điện nước) từ T2/2027 thay cho ước tính 2.000.000 đ/tháng', can:'Chủ quán ghi sổ chi hạng mục Thuê vị trí / Điện, nước', xong:() => false, tt:() => today() >= '2027-02-01' ? 'đến hạn' : 'chờ tới 01/02/2027'},
   {nhom:'Việc kỹ thuật', viec:'Đối soát doanh thu theo ca (ChotCa) với đơn bot', can:'Dashboard (đề xuất của Fable 5)'},
   {nhom:'Việc kỹ thuật', viec:'Tách món nóng / lạnh để tính đá đúng (hiện áp đá cho mọi món)', can:'Cần cột nóng / lạnh trong tab Menu'},
   {nhom:'Việc kỹ thuật', viec:'Co giãn theo giá sau 16/10: đo từ số ngày bán thật, không đặt tỉ lệ', can:'Cần ≥ 5 ngày sau đợt đồng giá'},
@@ -4739,7 +4740,7 @@ function renderKc(){
   /* 8 · công thức / định nghĩa, điểm mù, kiểm kho, lịch sử */
   $('kcGloss').innerHTML = '<thead><tr><th>Con số</th><th>Công thức / định nghĩa</th><th>Nguồn</th><th>Dùng ở</th></tr></thead><tbody>' + GLOSS_KAI.map(g => `<tr><td><b>${esc(g[0])}</b></td><td style="white-space:normal">${esc(g[1])}</td><td class="muted">${esc(g[2])}</td><td class="muted">${esc(g[3])}</td></tr>`).join('') + '</tbody>';
   $('kcMu').innerHTML = [['Hao hụt 5% do chủ quán chốt chung cho nguyên liệu không tính theo ly; hao hụt thật từ /kiemkho chỉ hiển thị cạnh (cột "Hao hụt thật" ở trên), không thay 5%.', ''], ['Đường, nắp ly chưa rõ: đường tính theo ly dùng (ước tính), nắp có thể chưa nằm trong giá ly 900 đ.', ''], ['Lương theo bot gồm cả chủ quán; ngày khai trương có thể cao hơn ngày thường.', ''],
-    ['Chi cố định 2.000.000 đ/tháng từ T1/2027 (thuê chỗ + điện nước, miễn phí tới hết T12/2026) do chủ quán chốt, chưa có hoá đơn thật.', ''], ['Hàng cho kèm và chi vận hành hệ thống T10 bỏ qua theo chủ quán; từ T11 hàng cho kèm sẽ tính theo kho thực.', ''], ['Trang thiết bị (đầu tư ngoài phí NQ) không khấu hao, không vào lãi.', ''],
+    ['Chi cố định 2.000.000 đ/tháng từ T2/2027 (thuê chỗ + điện nước, miễn phí tới hết T1/2027) do chủ quán chốt, chưa có hoá đơn thật.', ''], ['Hàng cho kèm và chi vận hành hệ thống T10 bỏ qua theo chủ quán; từ T11 hàng cho kèm sẽ tính theo kho thực.', ''], ['Trang thiết bị (đầu tư ngoài phí NQ) không khấu hao, không vào lãi.', ''],
     ['Giá bán "thường" hiện lấy theo giá menu (cơ cấu món đã bán) vì chưa có ngày bán giá thường.', ''], ['Dự phóng 12 tháng giữ nguyên số ly, giá vốn/ly và lương/ngày đang đo được (không thêm giả định); chưa có số ly thật ở giá menu cho tới khi hết đợt 10K, và chưa có dải bất định (cần ≥ 14 ngày bán).', '']]
     .map(x => `<li>${esc(x[0])} ${esc(x[1])}</li>`).join('');
   $('kcNote').innerHTML = `Chỉ dùng số thật trong sheet: <b>kiểm data trước khi tin số</b> · <b>chỉ kết luận khi đủ mẫu</b> · số nào còn là ước tính thì đánh dấu đỏ · tự kiểm bất biến bằng code chạy trên chính data đang xem.`;
@@ -4899,7 +4900,7 @@ function renderDoNhay(par){
     {k:'ly', l:'Ly / ngày', r:1, f:(v, r) => fmt(v) + (r && r.hienTai ? ' <span class="pill neu">ô kịch bản</span>' : '')}, {k:'dt', l:`Doanh thu / tháng (giá ${fmt(giaM)})`, r:1, f:fmt},
     {k:'laiVH', l:'Lãi vận hành / tháng', r:1, f:fmt, cls:v => v < 0 ? 'dn' : 'up'}, 
     {k:'rong10k', l:`Lãi ròng nếu vẫn đồng giá ${fmt(PROMO_GIA)}`, r:1, f:fmt, cls:v => v < 0 ? 'dn' : 'up'},
-    {k:'rongDau', l:'Lãi ròng 3 tháng đầu (miễn chi cố định)', r:1, f:fmt, cls:v => v < 0 ? 'dn' : 'up'}]});
+    {k:'rongDau', l:'Lãi ròng 4 tháng đầu (miễn chi cố định, tới hết T1/2027)', r:1, f:fmt, cls:v => v < 0 ? 'dn' : 'up'}]});
   const xs = []; for (let x = 20; x <= 160; x += 10) xs.push(x);
   mk('cPlanDn', {type:'line', data:{labels:xs, datasets:[
       {label:`Giá thường ${fmt(giaM)}`, data:xs.map(x => Math.round(du(x, giaM, par.cd).rong)), borderColor:c1, backgroundColor:c1, borderWidth:2, pointRadius:2, tension:.1},
@@ -4909,7 +4910,7 @@ function renderDoNhay(par){
   const beTxt = gia => { const b = hoaVonLyNgay(gia, {cogs:par.cogs, luong:par.luong, cd:par.cd, kh, ngay:30});
     return b.vanHanh != null ? ` · hoà vốn ~<b class="num">${fmt(b.vanHanh)} ly/ngày</b>` : ' · giá vốn ≥ giá bán, không bao giờ hoà vốn'; };
   $('lgPlanDn').innerHTML = `<span><i style="background:${c1}"></i>Giá thường ${fmt(giaM)}${beTxt(giaM)}</span><span><i style="background:${c2}"></i>Đồng giá ${fmt(PROMO_GIA)}${beTxt(PROMO_GIA)}</span>`;
-  $('planDnNote').innerHTML = `Cùng tham số với các ô kịch bản ở trên: giá vốn <b>${fmt(par.cogs)} đ/ly</b> · lương <b>${fmt(l30)} đ/tháng</b> (${fmt(par.luong)} × 30) · chi cố định ${fmt(par.cd)} đ/tháng từ T1/2027 · không tính khấu hao đầu tư (xem Thu hồi vốn đầu tư ở tab Thu chi).`;
+  $('planDnNote').innerHTML = `Cùng tham số với các ô kịch bản ở trên: giá vốn <b>${fmt(par.cogs)} đ/ly</b> · lương <b>${fmt(l30)} đ/tháng</b> (${fmt(par.luong)} × 30) · chi cố định ${fmt(par.cd)} đ/tháng từ T2/2027 · không tính khấu hao đầu tư (xem Thu hồi vốn đầu tư ở tab Thu chi).`;
 }
 /** v1.7.5 — thẻ Lịch làm (tab Nhân sự; từ v1.7.191 chỉ còn dòng tóm tắt trong thẻ Lịch làm theo đợt): 3 tuần (T2→CN) từ tuần này, mỗi ngày mỗi ca ai nhận, ai đã chấm công / vắng, thiếu bao nhiêu người, nghỉ bán, chờ duyệt */
 function renderLich(){
@@ -6349,7 +6350,7 @@ function nangLuc30p(){
 const NL30 = () => nangLuc30p().v;   // null = chưa đo được
 const NL30_TXT = () => NL30() != null ? `${NL30().toLocaleString('vi-VN', {maximumFractionDigits:1})} ly/30 phút` : 'chưa đo được';
 const KHAU_HAO = {tong:27e6, thang:12, tu:'2026-10'};   // phí nhượng quyền 22tr + cọc 5tr đã trả đủ, không thu thêm → chia đều 12 tháng từ T10/2026 (chủ chốt 15/10/2026; trước đó 6 tháng). Sheet Tổng hợp cùng số tháng ở ô "Số tháng khấu hao"
-const CHI_CO_DINH_THANG = 2e6;   // thuê chỗ + điện nước…: miễn 3 tháng đầu (T10–T12/2026), từ T1/2027 tổng ~2tr/tháng (chủ chốt 11/10/2026)
+const CHI_CO_DINH_THANG = 2e6;   // thuê chỗ + điện nước…: miễn 4 tháng đầu (T10/2026–T1/2027), từ T2/2027 tổng ~2tr/tháng (chủ chốt 11/10/2026, gia hạn thêm T1/2027 ngày 23/11)
 const PROMO_GIA = 10000;   // giá đồng giá khai trương
 const HAO_HUT = 0.05;   // hao hụt + đổ bỏ: cộng 5% lên giá vốn nguyên liệu mỗi ly (chủ chốt 11/10/2026). Ly trà đá/hàng cho kèm tính riêng, không nằm trong công thức.
 const boDau = s => String(s ?? '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/đ/g, 'd');
