@@ -3175,10 +3175,10 @@ function doanhThuThuCore(orders, chot, legacy, tk, tick){
   return {thang, tong:bot + chenh, bot, chenh, app, ngayBan:ngayBan.size, ngayChot:[...ngayBan].filter(k => chotNgay.has(k)).length, chuaChot:[...ngayBan].filter(k => k < tk && !chotNgay.has(k)).sort()};
 }
 const doanhThuThu = () => doanhThuThuCore(D.orders, D.chot, D.legacyRev, today(), D.chotSheet);
-/** v1.7.6 — Tiền còn lại tách 2 cục (chủ quán chốt 14/10/2026): mặc định mọi khoản (vốn góp, chi, doanh thu) là tiền CK; chỉ phần doanh thu từng ngày chủ báo "giữ lại thành tiền mặt" (cột Trích tiền mặt tab Doanh thu: 13/10 giữ 500.000, 14/10 giữ 669.000) là tiền mặt.
+/** v1.7.6 — Tiền còn lại tách 2 cục (chủ quán chốt 14/10/2026): mặc định mọi khoản (vốn góp, chi, doanh thu) là tiền CK; chỉ tiền mặt lúc chốt ca từng ngày (cột Tiền mặt tab Doanh thu; từ v1.7.341 bỏ cột Trích tiền mặt) là tiền mặt.
  *  tm = Σ trích tới hết hôm nay · ck = tiền còn lại − tm (cộng 2 cục luôn bằng tổng). */
 /** v1.7.33 — Doanh thu thực thu từng ngày tách NGUỒN TIỀN sau chốt ca (chủ quán 16/10/2026; cùng luật tab Doanh thu cột Tiền mặt / CK và tab Quỹ tiền):
- *  ngày đã chốt (dòng ChotCa có hiệu lực hoặc tick CHỐT CA) → thực thu = đơn bot + Lệch; 💵 mặt = phần chủ báo giữ lại (cột Trích tiền mặt, tối đa bằng thực thu), 🏦 CK = phần còn lại (đã nộp vào CK);
+ *  ngày đã chốt (dòng ChotCa có hiệu lực hoặc tick CHỐT CA) → thực thu = đơn bot + Lệch; 💵 mặt = tm lúc chốt ca (cột Tiền mặt tab Doanh thu, tối đa bằng thực thu), 🏦 CK = phần còn lại (đã nộp vào CK);
  *  ngày chưa chốt ca → theo đơn bot (mặt / CK theo cách nhân viên bấm lúc bán), đánh dấu chot = false (tạm). Trả { 'yyyy-mm-dd': {tt, tm, ck, chot, bot} }. */
 function nguonTienCore(orders, chot, tick, tienMat){
   const ngay = {}, ds = k => ngay[k] || (ngay[k] = {k, bot:0, botTm:0, botCk:0, app:0, be:0, xanh:0, giu:0, chot:false, chenh:0});
@@ -3244,7 +3244,7 @@ function renderFin(){
   const tamNguoi = {}; congTam.forEach(c => tamNguoi[c.nv] = (tamNguoi[c.nv] || 0) + (c.tien || 0) + (c.cc || 0) + (c.tl || 0)); (D.thuongPhat || []).filter(x => !daChotLuong(x.id, x.k)).forEach(x => tamNguoi[x.nv] = (tamNguoi[x.nv] || 0) + x.tien);
   // Hàng cho kèm (ly trà đá, ly pha trà/bọc đá, trà sâm dứa): tính riêng theo tiền chi thực tế, không hao hụt, không nằm trong giá vốn/ly
   const choKem = D.chi.filter(r => laChoKem(r) && !laBoQua(r) && r.m < THANG_KHO_KEM).reduce((s, r) => s + r.amt, 0) + D.chi.filter(laBaoBiPhu).reduce((s, r) => s + r.amt, 0)
-    + choKemKhoKy([D.first, ...D.chi.map(r => r.k)].filter(Boolean).sort()[0] || today(), today()).tien, boQuaFin = D.chi.filter(laBoQua).reduce((s, r) => s + r.amt, 0);   // v1.7.281: cùng cách PNL — T11+ cho kèm theo kho thực, bao bì phụ theo tiền mua
+    + choKemKhoKy([D.first, ...D.chi.map(r => r.k)].filter(Boolean).sort()[0] || today(), today()).tien, boQuaFin = D.chi.filter(laBoQua).reduce((s, r) => s + r.amt, 0);   // v1.7.281: cùng cách PNL — T11+ cho kèm theo kho thực, bao bì phụ theo tiền mua / phần phân bổ tháng
   const lai = gvBan == null || cogs == null || (!lyBan && !luongBot && !chiKhac && !choKem) ? null : totalRev - gvBan - chiKhac - luongBot - choKem, laiSo = totalRev - opex;   // v1.7.42 (Fable 5 T-20): chưa có đơn, lương, chi → chưa có số thật
   // Khấu hao khoản đầu tư nhượng quyền: chia đều theo ngày, từ ngày bắt đầu tới hôm nay (cùng cách tính tab PNL)
   // v1.7.58 (chủ quán 18/10): lãi không trừ khấu hao. Thu hồi vốn đầu tư = lãi cộng dồn ÷ tổng đầu tư (sổ chi khối Đầu tư); dự kiến theo lãi TB / ngày 14 ngày gần nhất
@@ -3630,7 +3630,9 @@ function luongNgayPnl(k){
 }
 /* v1.7.347 (chủ 23/11: lãi vận hành PNL phải khớp Sheet) — (1) lãi vận hành cộng chênh két các ngày đã chốt ca (thực thu, như Sheet); (2) kỳ gồm TRỌN tháng (từ ngày 1 tới cuối tháng / hôm nay) trừ đủ khoản cả tháng ngay khi ghi sổ, kỳ lẻ ngày / tuần vẫn giãn theo ngày; (3) "Tất cả" bắt đầu giữa tháng mở quán thì lấy chi phí từ ngày 1. gianNgay = true: luôn giãn theo ngày (tính lãi TB 14 ngày). */
 const pnlTuNgay = (from, to, first) => from === first && to >= first.slice(0, 8) + p2(ngayTrongThang(mkey(first))) ? first.slice(0, 8) + '01' : from;
-const pnlTronThang = (ngay, dau, het) => ngay.length > 1 && rangeDays(dau, het).every(k => ngay.includes(k));
+/* v1.7.358 (chủ 23/11): trọn tháng chỉ khi kỳ BẮT ĐẦU từ mùng 1 — tuần / 7 ngày vắt qua đầu tháng (27/11–03/12) vẫn giãn theo ngày, trước đó đầu tháng bị trừ nguyên khoản cả tháng mới. gianNgay: true = luôn giãn · 'tron' = theo kỳ mẹ đã tính trọn tháng (bảng từng ngày) · trống = tự xét */
+const pnlTronDau = (ngay, gianNgay) => gianNgay === 'tron' || (!gianNgay && ngay.length > 1 && ngay[0].slice(8) === '01');
+const pnlTronThang = (ngay, dau, het, gianNgay) => pnlTronDau(ngay, gianNgay) && rangeDays(dau, het).every(k => ngay.includes(k));
 function tinhPnl(from, to, gianNgay){
   from = pnlTuNgay(from, to, D.first);
   const L = sel(new Set(['nv', 'pt', 'mon', 'hour']), from, to), A = agg(L), G = giaNL(), cogs = cogsO();   // v1.3: ô trống → null (chưa có số thật)
@@ -3654,7 +3656,7 @@ function tinhPnl(from, to, gianNgay){
   // v1.7.64 (chủ quán 19/10: xem ngày / tuần thiếu 600.000 + 159.000): chi vận hành của tháng chia đều cho các ngày của tháng đó (tháng đang chạy: chia cho số ngày đã qua) → xem 1 ngày / tuần cũng gánh phần mình; cộng cả tháng (tới hôm nay) vẫn đủ
   { const tkV = today(); [...new Set(ngay.map(mkey))].forEach(m => { const dau = m + '-01', cuoi = m + '-' + p2(ngayTrongThang(m)), het = cuoi < tkV ? cuoi : tkV; if (het < dau) return;
       const nM = rangeDays(dau, het).length, nKy = ngay.filter(k => mkey(k) === m && k <= het).length; if (!nKy) return;
-      const nCaThang = ngayTrongThang(m), tron = !gianNgay && pnlTronThang(ngay, dau, het), nKyCa = tron ? nCaThang : ngay.filter(k => mkey(k) === m).length;   // v1.7.347: trọn tháng → trừ đủ khoản cả tháng
+      const nCaThang = ngayTrongThang(m), tron = pnlTronThang(ngay, dau, het, gianNgay), nKyCa = tron ? nCaThang : ngay.filter(k => mkey(k) === m).length;   // v1.7.347: trọn tháng → trừ đủ khoản cả tháng
       baoBiPhu += D.chi.filter(r => r.m === m && dayOk(r.k) && laChiCaThang(r) && laBaoBiPhu(r)).reduce((t, r) => t + r.amt * nKyCa / nCaThang, 0);   // v1.7.348
 
       D.chi.filter(r => r.m === m && dayOk(r.k) && !laBoQua(r) && !laChoKem(r) && !laDauTu(r) && r.block !== 'Giá vốn' && r.block !== 'Nhân sự' && r.block !== '?').forEach(r => vh[r.cat] = (vh[r.cat] || 0) + (laChiCaThang(r) ? (vhGian += r.amt * (nKy / nM - nKyCa / nCaThang), r.amt * nKyCa / nCaThang) : r.amt * nKy / nM)); }); }
@@ -3667,7 +3669,7 @@ function tinhPnl(from, to, gianNgay){
   });
   const choKem = choKemMua + ckKho.tien + baoBiPhu, vhTong = Object.values(vh).reduce((s, x) => s + x, 0) + coDinhUoc, khauHao = khauHaoNgay(ngay);
   const gv = gvNL + gvBB + gvKhac, laiGop = A.dt - gv, NTk = nguonTien(), ket = ngay.reduce((a, k) => a + (NTk[k] && NTk[k].chot ? NTk[k].chenh || 0 : 0), 0), laiVH = laiGop - choKem - luong - vhTong + ket;   // v1.7.347: + chênh két
-  return {L, A, G, ngay, nl, day, mon, chuaCT, thieu, gvNL, gvBB, gvKhac, gv, dt:A.dt, laiGop, choKem, luong, luongTam, luongSoChi, vh, coDinhUoc, coDinhTam, mienPhi, vhTong, vhGian, ket, tu:from, laiVH, khauHao, laiRong:laiVH,   /* v1.7.58: lãi không trừ khấu hao — laiRong giữ tên, = laiVH; khauHao chỉ để tham khảo */ choDi, cogs, gvM, boQuaMk, boQuaCK, choKemMua, choKemKho:ckKho.tien, choKemKhoMuc:ckKho.muc, choKemThieu:ckKho.thieu, baoBiPhu, khongGiaVon};
+  return {L, A, G, ngay, nl, day, mon, chuaCT, thieu, gvNL, gvBB, gvKhac, gv, dt:A.dt, laiGop, choKem, luong, luongTam, luongSoChi, vh, coDinhUoc, coDinhTam, mienPhi, vhTong, vhGian, ket, tronDau:pnlTronDau(ngay, gianNgay), tu:from, laiVH, khauHao, laiRong:laiVH,   /* v1.7.58: lãi không trừ khấu hao — laiRong giữ tên, = laiVH; khauHao chỉ để tham khảo */ choDi, cogs, gvM, boQuaMk, boQuaCK, choKemMua, choKemKho:ckKho.tien, choKemKhoMuc:ckKho.muc, choKemThieu:ckKho.thieu, baoBiPhu, khongGiaVon};
 }
 /** v1.7.250 (chủ quán 12/11/2026: PNL lãi vận hành 257.518 ≠ Tổng quan 69.518) — đối chiếu "Lãi vận hành" của PNL với lãi tháng ở Tổng quan / Thu chi
  *  (cùng Sheet Tổng hợp). v1.7.347: PNL đã cộng chênh két + trừ đủ khoản cả tháng ở kỳ trọn tháng nên thường khớp; trước đó hai cách tính khác: PNL = doanh thu đơn bot, khoản chi "cả tháng" giãn theo ngày, chi cố định chưa ghi sổ tạm tính;
@@ -3703,7 +3705,7 @@ function renderPnl(){
     + (P.boQuaMk || P.boQuaCK ? ` <span class="pill neu">Đã bỏ qua theo chủ quán (T10/2026): ${[P.boQuaMk ? 'vận hành hệ thống / marketing ' + fmt(P.boQuaMk) : '', P.boQuaCK ? 'hàng cho kèm ' + fmt(P.boQuaCK) : ''].filter(Boolean).join(' + ')} đ · từ T11 hàng cho kèm tính theo kho thực</span>` : '')
     + (P.chuaCT.size ? ` <span class="pill warn">Chưa có công thức: ${esc([...P.chuaCT].join(', '))} → ${P.khongGiaVon ? `giá vốn 0 cho ${fmt(P.khongGiaVon)} ly (chưa tính được giá vốn/ly bình quân, chưa có số thật)` : 'tạm tính theo giá vốn/ly bình quân'}</span>` : '')
     + (P.thieu.size ? ` <span class="pill warn">Thiếu giá mua: ${esc([...P.thieu].join(', '))}</span>` : '')
-    + ((P.choKemKho || P.baoBiPhu || P.choKemThieu.length) ? ` <span class="pill neu" style="text-transform:none" title="v1.7.280: từ T11/2026 hàng cho kèm tính theo kho thực (đếm xe + kho), bao bì phụ không có trong công thức tính theo tiền mua">Hàng cho kèm & bao bì phụ ${fmt(P.choKem)} đ: ${[P.choKemMua ? 'cho kèm theo tiền mua (trước T11) ' + fmt(P.choKemMua) : '', ...P.choKemKhoMuc.map(x => `${esc(x.ten)} dùng ${soLe(x.dung)} ${esc(x.dv)} (${ngDM(x.tu)}→${ngDM(x.den)}, đếm xe + kho) ${fmt(x.phan)}`), P.baoBiPhu ? 'bao bì phụ theo tiền mua ' + fmt(P.baoBiPhu) : ''].filter(Boolean).join(' · ') || '0'}${P.choKemThieu.length ? ' · <b>chưa tính được:</b> ' + esc(P.choKemThieu.join(' · ')) : ''}</span>` : '');
+    + ((P.choKemKho || P.baoBiPhu || P.choKemThieu.length) ? ` <span class="pill neu" style="text-transform:none" title="v1.7.280: từ T11/2026 hàng cho kèm tính theo kho thực (đếm xe + kho), bao bì phụ không có trong công thức tính theo tiền mua">Hàng cho kèm & bao bì phụ ${fmt(P.choKem)} đ: ${[P.choKemMua ? 'cho kèm theo tiền mua (trước T11) ' + fmt(P.choKemMua) : '', ...P.choKemKhoMuc.map(x => `${esc(x.ten)} dùng ${soLe(x.dung)} ${esc(x.dv)} (${ngDM(x.tu)}→${ngDM(x.den)}, đếm xe + kho) ${fmt(x.phan)}`), P.baoBiPhu ? 'bao bì phụ (mua lẻ + phần phân bổ của kỳ) ' + fmt(P.baoBiPhu) : ''].filter(Boolean).join(' · ') || '0'}${P.choKemThieu.length ? ' · <b>chưa tính được:</b> ' + esc(P.choKemThieu.join(' · ')) : ''}</span>` : '');
 
   { const gTang = Object.values(P.G).filter(g => g.slTang > 0 && g.sl > 0), gTC = Object.values(P.G).filter(g => g.thamChieu);
     $('pnlNote').innerHTML += (gTC.length ? ` Giá tham chiếu (cột R tab Kho, vì chưa có dòng mua trả tiền): ${gTC.map(g => `${esc(g.k.ten)} ${fmt(g.k.giaTC)} đ/${esc(g.k.dv)}`).join(', ')}.` : '')
@@ -3803,7 +3805,7 @@ function renderPnl(){
   const vhMode = S.pnlNgayVH === 'vh', tenLai = vhMode ? 'Lãi sau lương + vận hành' : 'Lãi sau lương';
   /* v1.7.174: vận hành của mỗi tháng trong kỳ (kể cả phần của ngày không bán, vd 01–09/10 trước khai trương) chia đều cho các ngày CÓ BÁN của tháng đó → cộng các ngày = đúng hàng cho kèm + chi vận hành của kỳ (trước đây cộng từng ngày lẻ nên thiếu phần ngày không bán) */
   const vhThang = {}; { const banM = {}; Object.keys(P.day).forEach(k => banM[mkey(k)] = (banM[mkey(k)] || 0) + 1);
-    Object.keys(banM).forEach(m => { const ng = P.ngay.filter(k => mkey(k) === m), Pm = ng.length ? tinhPnl(ng[0], ng[ng.length - 1]) : null; vhThang[m] = Pm ? (Pm.choKem + Pm.vhTong - Pm.ket) / banM[m] : 0; }); }
+    Object.keys(banM).forEach(m => { const ng = P.ngay.filter(k => mkey(k) === m), Pm = ng.length ? tinhPnl(ng[0], ng[ng.length - 1], P.tronDau ? 'tron' : true) : null; vhThang[m] = Pm ? (Pm.choKem + Pm.vhTong - Pm.ket) / banM[m] : 0; }); }
   const dayRows = Object.values(P.day).sort((a, b) => a.k < b.k ? -1 : 1).map(d => { const lu = luongNgay(d.k), laiGop = d.dt - d.gv, vh = vhThang[mkey(d.k)] || 0, lai = laiGop - lu.luong;
     return {k:d.k, ly:d.ly, dt:d.dt, gv:d.gv, laiGop, luong:lu.luong, tam:lu.tam, lai, vh, laiVH:lai - vh, v:vhMode ? lai - vh : lai, laiLy:d.ly ? (vhMode ? lai - vh : lai) / d.ly : null}; });
   $('pnlNgayMode').value = vhMode ? 'vh' : ''; $('pnlNgayMode').onchange = () => { S.pnlNgayVH = $('pnlNgayMode').value; renderPnl(); };
@@ -3993,7 +3995,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.357';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.358';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4051,6 +4053,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.358', ngay:'23/11/2026', nd:['PNL, Báo cáo: tuần / 7 ngày vắt qua đầu tháng không còn bị trừ nguyên khoản phân bổ cả tháng mới (chia theo ngày); xem tháng và Tất cả giữ nguyên số', 'PNL: bảng từng ngày luôn cùng cách chia với tổng của kỳ; chữ bao bì phụ ghi đúng cách phân bổ']},
   {v:'v1.7.357', ngay:'23/11/2026', nd:['💵 Tiền mặt theo đợt làm việc: chỉ hiện tháng đang xem, đợt vắt 2 tháng tính riêng từng tháng']},
   {v:'v1.7.356', ngay:'23/11/2026', nd:['Chip đơn nhiều ly theo cỡ đơn: ✌️ đơn 2 · 🔥 đơn 3 · 🚀 đơn 4 · 👑 đơn 5 trở lên']},
   {v:'v1.7.355', ngay:'23/11/2026', nd:['Chip đơn nhiều ly: sửa icon số chưa hiện']},
@@ -4354,7 +4357,7 @@ function tuKiem(){
     const tkT = [{k:'2026-10-02', chenh:10}, {k:'2026-10-01', chenh:99}], dtK = doanhThuThuCore(odT, ctT, [], '2026-10-03', tkT);
     ok('Chốt ca ở tab Doanh thu: ngày 02/10 tick + Lệch +10 (không có dòng ChotCa) → đã chốt 2/2 ngày, thực thu 300 + (−15) + 10 = 295, hết cảnh báo chưa chốt; ngày 01/10 có cả ChotCa (−20, +5) lẫn tick (+99) thì ChotCa thắng, không cộng hai lần',
       dtK.tong === 295 && dtK.chenh === -5 && dtK.ngayChot === 2 && dtK.chuaChot.length === 0 && dtK.thang['2026-10'] === 295, `${dtK.tong} · chênh ${dtK.chenh} · ${dtK.ngayChot}/${dtK.ngayBan}`);
-    // 40. Nguồn tiền thực thu sau chốt ca (cùng luật tab Doanh thu / Quỹ tiền): ngày đã chốt = đơn bot + Lệch, mặt = trích tiền mặt (tối đa bằng thực thu), CK = phần còn lại; ngày chưa chốt = theo đơn bot
+    // 40. Nguồn tiền thực thu sau chốt ca (cùng luật tab Doanh thu / Quỹ tiền): ngày đã chốt = đơn bot + Lệch, mặt = tm lúc chốt ca (tối đa bằng thực thu), CK = phần còn lại; ngày chưa chốt = theo đơn bot
     const ntT = nguonTienCore([{k:'2026-10-14', tt:790, pt:'TM'}, {k:'2026-10-15', tt:930, pt:'TM'}, {k:'2026-10-16', tt:500, pt:'TM'}, {k:'2026-10-16', tt:100, pt:'CK'}, {k:'2026-10-13', tt:870, pt:'TM'}],
       [{k:'2026-10-14', chenh:-1}, {k:'2026-10-13', chenh:10}], [{k:'2026-10-15', chenh:35}], [{k:'2026-10-14', tm:669}, {k:'2026-10-15', tm:745}, {k:'2026-10-13', tm:900}]);
     const nt14 = ntT['2026-10-14'], nt15 = ntT['2026-10-15'], nt16 = ntT['2026-10-16'], nt13 = ntT['2026-10-13'], ntS = nguonTienTong(ntT, ['2026-10-14', '2026-10-15', '2026-10-16']);
@@ -4690,7 +4693,7 @@ function tuKiem(){
       try { FIN_THANG.filter(r => r.m <= mkey(today()) && r.rev).forEach(r => { const tu = r.m + '-01', cuoi = r.m + '-' + p2(ngayTrongThang(r.m)), den = cuoi < today() ? cuoi : today(); if (tu === den) return;
         const Pm = tinhPnl(tu, den), dc = doiChieuPnlCore(Pm, tu, den, FIN_THANG, today()); dsT.push(`${mlabel(r.m)} ${fmt(Pm.laiVH)} / ${fmt(r.lai)}`);
         if (!dc || Math.abs(dc.ket) > 1 || Math.abs(dc.gian) > 1 || (Math.abs(dc.khac) > 1 && !Pm.luongTam)) loi += r.m + ' ' + JSON.stringify(dc) + ' '; }); } finally { S.day = keepD; }
-      ok('v1.7.347: lãi vận hành PNL trọn tháng = lãi tháng Sheet Tổng hợp (gồm chênh két, khoản cả tháng trừ đủ); "Tất cả" tính chi phí từ ngày 1 tháng mở quán', !loi && pnlTuNgay('2026-10-10', '2026-11-23', '2026-10-10') === '2026-10-01' && pnlTuNgay('2026-10-10', '2026-10-12', '2026-10-10') === '2026-10-10' && pnlTronThang(rangeDays('2026-11-01', '2026-11-05'), '2026-11-01', '2026-11-05') && !pnlTronThang(rangeDays('2026-11-02', '2026-11-05'), '2026-11-01', '2026-11-05') && !pnlTronThang(['2026-11-01'], '2026-11-01', '2026-11-01'), loi || dsT.join(' · ')); }
+      ok('v1.7.347: lãi vận hành PNL trọn tháng = lãi tháng Sheet Tổng hợp (gồm chênh két, khoản cả tháng trừ đủ); "Tất cả" tính chi phí từ ngày 1 tháng mở quán', !loi && pnlTuNgay('2026-10-10', '2026-11-23', '2026-10-10') === '2026-10-01' && pnlTuNgay('2026-10-10', '2026-10-12', '2026-10-10') === '2026-10-10' && pnlTronThang(rangeDays('2026-11-01', '2026-11-05'), '2026-11-01', '2026-11-05') && !pnlTronThang(rangeDays('2026-11-02', '2026-11-05'), '2026-11-01', '2026-11-05') && !pnlTronThang(['2026-11-01'], '2026-11-01', '2026-11-01') && !pnlTronThang(rangeDays('2026-11-27', '2026-12-03'), '2026-12-01', '2026-12-03') && pnlTronThang(rangeDays('2026-10-01', '2026-11-05'), '2026-11-01', '2026-11-05') && pnlTronThang(['2026-11-01'], '2026-11-01', '2026-11-01', 'tron') && !pnlTronThang(rangeDays('2026-11-01', '2026-11-05'), '2026-11-01', '2026-11-05', true), loi || dsT.join(' · ')); }
     // 102. v1.7.345 — tổng cả kỳ ở PNL: doanh thu − chi hoạt động = lãi = lãi Thu chi; cho kèm ở giá vốn; giá menu
     { const c0 = caKyCore([{rev:1000, gv:400, ck:50, ns:200, vh:150, lai:250}, {rev:0, gv:0, ck:0, ns:0, vh:30, lai:-30}]), m0 = giaMenuCore([{ma:'A', sl:10}, {ma:'zz', sl:5}], {x:{ma:'a', gia:120}}, c0), c1 = caKyCore(FIN_THANG);
       ok('v1.7.345: PNL cả kỳ — doanh thu − chi hoạt động = lãi hoạt động = lãi Thu chi; hàng cho kèm nằm ở giá vốn như Sheet; lãi giá menu = lãi + (doanh thu menu − doanh thu thực)',
