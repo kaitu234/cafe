@@ -965,8 +965,9 @@ html.mcap{background:var(--paper)}
         <div class="legend" id="lgMix"></div>
       </div>
       <div class="card">
-        <div class="ct">Giá TB / ly theo ngày <span class="nt">· doanh thu ÷ số ly</span></div>
-        <div class="cw"><canvas id="cAsp" aria-label="Giá trung bình mỗi ly theo ngày"></canvas></div>
+        <div class="ct">Giá TB / ly theo ngày <span class="nt">· đường = doanh thu ÷ số ly · cột = ly size L (trục phải)</span></div>
+        <div class="cw"><canvas id="cAsp" aria-label="Giá trung bình mỗi ly và số ly size L theo ngày"></canvas></div>
+        <div class="legend" id="lgAsp"></div>
       </div>
     </div>
 
@@ -1525,8 +1526,8 @@ html.mcap{background:var(--paper)}
     </div>
     <div class="kpis" id="hrTop"></div>
     <div class="card" id="sec-hr-hs" hidden>
-      <div class="ct">Hiệu suất theo giờ lương <span class="nt">· mỗi ngày: doanh thu và ly bán trong ca nhân viên ÷ giờ tính lương (trong ca + vào sớm) · không tính chủ · theo bộ lọc kỳ + nhân viên</span></div>
-      <div class="cw"><canvas id="cHrHs" aria-label="Doanh thu và số ly trên mỗi giờ lương theo ngày"></canvas></div>
+      <div class="ct">Hiệu suất theo giờ lương <span class="nt">· mỗi ngày: doanh thu và ly bán trong ca nhân viên ÷ giờ tính lương (trong ca + vào sớm) · đường trên cùng = giá TB / ly · không tính chủ · theo bộ lọc kỳ + nhân viên</span></div>
+      <div class="cw"><canvas id="cHrHs" aria-label="Doanh thu và số ly trên mỗi giờ lương, giá trung bình mỗi ly theo ngày"></canvas></div>
       <div class="legend" id="lgHrHs"></div>
       <p class="muted" id="hrHsNguoi" style="margin:6px 0 0;font-size:12px"></p>
     </div>
@@ -2578,9 +2579,14 @@ function renderSales(){
 
   /* --- asp --- */
   const aspD = days.map((k, i) => dayLy[i] ? dtD[i] / dayLy[i] : null);
-  mk('cAsp', {type:'line', data:{labels:days.map(k => dShort(k)), datasets:[{label:'Giá TB/ly', data:aspD, borderColor:s3, backgroundColor:s3, borderWidth:2, pointRadius:3, pointHoverRadius:5, spanGaps:true, tension:.2}]},
-    options:{scales:{y:{beginAtZero:true, grid:{color:css('--line')}, border:{display:false}, ticks:{maxTicksLimit:5, callback:v => fmtK(v)}}},
-      plugins:{tooltip:{callbacks:{label:c => ` ${fmt(c.raw)} đ/ly`}}}}});
+  /* v1.7.338 (chủ 23/11): cột ly size L = hệ số 1 < hs < 2 (cùng cách chip L và Gợi ý bán hàng; gồm free upsize, tặng L, app), cùng bộ lọc với giá TB/ly */
+  const lyLD = days.map((k, i) => dayLy[i] ? (byDay.get(k) || []).filter(o => o.hs > 1 && o.hs < 2).reduce((s, o) => s + o.sl, 0) : null), tongL = lyLD.reduce((a, v) => a + (v || 0), 0), tongLy = dayLy.reduce((a, v) => a + v, 0), trucL = Math.ceil(Math.max(0, ...lyLD) * 2.7 / 3) * 3 || 3;
+  mk('cAsp', {type:'bar', data:{labels:days.map(k => dShort(k)), datasets:[Object.assign({label:'Ly size L', data:lyLD, yAxisID:'y1', order:2}, barStyle(ghost)),
+    {type:'line', label:'Giá TB/ly', data:aspD, yAxisID:'y', nhan:'het', order:1, borderColor:s3, backgroundColor:s3, borderWidth:2, pointRadius:3, pointHoverRadius:5, spanGaps:true, tension:.2}]},
+    options:{scales:{y:{beginAtZero:true, grid:{color:css('--line')}, border:{display:false}, ticks:{maxTicksLimit:5, callback:v => fmtK(v)}},
+        y1:{position:'right', beginAtZero:true, max:trucL, grid:{display:false}, border:{display:false}, ticks:{stepSize:trucL / 3}}},
+      plugins:{nhanSo:{fmt:(v, j, di) => di === 1 ? soNhan(v / 1000) + 'k' : soNhan(v)}, tooltip:{filter:c => c.raw != null, callbacks:{label:c => c.dataset.yAxisID === 'y1' ? ` Ly size L: ${fmt(c.raw)}/${fmt(dayLy[c.dataIndex])} ly (${pct(dayLy[c.dataIndex] ? c.raw / dayLy[c.dataIndex] : 0, 0)})` : ` Giá TB: ${fmt(c.raw)} đ/ly`}}}}});
+  $('lgAsp').innerHTML = `<span><i style="background:${s3}"></i>Giá TB / ly (đường, trục trái)</span><span><i style="background:${ghost}"></i>Ly size L (cột, trục phải) · cả kỳ ${fmt(tongL)} ly${tongLy ? ' · ' + pct(tongL / tongLy, 0) : ''}</span>`;
 
   /* --- auto comment --- */
   const bestH = hours[hLy.indexOf(Math.max(...hLy))], topMon = [...groupBy(L, o => o.mon)].map(([mon, l]) => ({mon, ly:l.reduce((t, o) => t + o.sl, 0)})).sort((a,b) => b.ly - a.ly)[0];   // v1.7.37: bảng món đã chuyển sang renderMon
@@ -3906,7 +3912,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.337';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.338';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3964,6 +3970,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.338', ngay:'23/11/2026', nd:['Nhân sự · Hiệu suất theo giờ lương: thêm đường giá TB / ly (ghi số từng ngày)', 'Bán hàng · Giá TB / ly theo ngày: thêm cột ly size L (trục phải), rê chuột xem % trên tổng ly']},
   {v:'v1.7.337', ngay:'23/11/2026', nd:['Bán hàng · Tiền mặt / CK theo ngày: thêm đường số ly mỗi ngày (trục phải, ghi số trên từng điểm)']},
   {v:'v1.7.336', ngay:'23/11/2026', nd:['Tài khoản nhân viên: bảng Chấm công và Ca ở Hôm nay hiện tiền từng ca của chính mình (lương nền, tiền công, lương/giờ); ca người khác để trống']},
   {v:'v1.7.335', ngay:'23/11/2026', nd:['Nhân sự · tài khoản nhân viên: bảng nhân viên hiện đủ cột lương, thưởng nhưng tiền chỉ ở dòng của chính mình; không có giờ có mặt thật']},
@@ -5931,16 +5938,21 @@ function renderHr(){
         d.g += g; p.g += g;
         trongCa(c).forEach(o => { p.ly += o.sl; p.dt += o.tt || 0; if (!d.don.has(o)){ d.don.add(o); d.ly += o.sl; d.dt += o.tt || 0; } }); });
       const ks = Object.keys(ngay).filter(k => ngay[k].g > 0).sort(), tg = ks.reduce((a, k) => a + ngay[k].g, 0), tly = ks.reduce((a, k) => a + ngay[k].ly, 0), tdt = ks.reduce((a, k) => a + ngay[k].dt, 0);
-      const s1 = css('--s1'), c2 = css('--c2');
+      const s1 = css('--s1'), c2 = css('--c2'), s2 = css('--s2');
+      /* v1.7.338 (chủ 23/11): đường giá TB / ly = doanh thu ÷ ly của cùng các đơn trong ca; trục riêng ẩn (gốc 0), hai trục kia chừa đầu để đường nằm trên cột */
+      const giaLy = ks.map(k => ngay[k].ly ? Math.round(ngay[k].dt / ngay[k].ly) : null), dinh = (f, hs, b) => Math.ceil(Math.max(0, ...ks.map(f)) * hs / b) * b || b,
+        trDt = dinh(k => ngay[k].dt / ngay[k].g, 1.35, 40000), trLy = dinh(k => ngay[k].ly / ngay[k].g, 1.5, 4), trGia = Math.max(1, ...giaLy) * 1.12;
       mk('cHrHs', {type:'bar', data:{labels:ks.map(k => `${thu(k)} ${dShort(k)}`), datasets:[
           Object.assign({label:'Ly / giờ lương', data:ks.map(k => +(ngay[k].ly / ngay[k].g).toFixed(2)), yAxisID:'y1', order:2}, barStyle(s1)),
-          {type:'line', label:'Doanh thu / giờ lương', data:ks.map(k => Math.round(ngay[k].dt / ngay[k].g)), yAxisID:'y', nhan:true, borderColor:c2, backgroundColor:c2, borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.25, spanGaps:true, order:1}]},
-        options:{plugins:{nhanSo:{fmt:(v, j, di) => di === 1 ? k1(v) : soNhan(v)},
-            tooltip:{callbacks:{label:x => x.datasetIndex === 1 ? ` Doanh thu / giờ lương: ${fmt(x.raw)} đ` : ` Ly / giờ lương: ${soNhan(x.raw)} ly`,
+          {type:'line', label:'Doanh thu / giờ lương', data:ks.map(k => Math.round(ngay[k].dt / ngay[k].g)), yAxisID:'y', nhan:true, borderColor:c2, backgroundColor:c2, borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.25, spanGaps:true, order:1},
+          {type:'line', label:'Giá TB / ly', data:giaLy, yAxisID:'y2', nhan:'het', borderColor:s2, backgroundColor:s2, borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:.25, spanGaps:true, order:0}]},
+        options:{plugins:{nhanSo:{fmt:(v, j, di) => di === 2 ? soNhan(v / 1000) + 'k' : di === 1 ? k1(v) : soNhan(v)},
+            tooltip:{callbacks:{label:x => x.datasetIndex === 2 ? ` Giá TB / ly: ${x.raw == null ? '—' : fmt(x.raw) + ' đ'}` : x.datasetIndex === 1 ? ` Doanh thu / giờ lương: ${fmt(x.raw)} đ` : ` Ly / giờ lương: ${soNhan(x.raw)} ly`,
               afterBody:it => { const d = it.length && ngay[ks[it[0].dataIndex]]; return d ? `${fmt(d.dt)} đ · ${fmt(d.ly)} ly ÷ ${f1(d.g)} giờ lương` : ''; }}}},
-          scales:{y:{beginAtZero:true, grid:{color:css('--line')}, border:{display:false}, ticks:{maxTicksLimit:5, callback:v => k1(v)}},
-            y1:{position:'right', beginAtZero:true, grace:'10%', grid:{display:false}, border:{display:false}, ticks:{maxTicksLimit:5}}}}});
-      $('lgHrHs').innerHTML = ks.length ? `<span><i style="background:${c2}"></i>Doanh thu / giờ lương (đường, trục trái) · cả kỳ ${fmt(tdt / tg)} đ</span><span><i style="background:${s1}"></i>Ly / giờ lương (cột, trục phải) · cả kỳ ${f1(tly / tg)} ly</span>` : '<span>Chưa có ca nhân viên trong kỳ</span>';
+          scales:{y:{beginAtZero:true, max:trDt, grid:{color:css('--line')}, border:{display:false}, ticks:{stepSize:trDt / 4, callback:v => k1(v)}},
+            y1:{position:'right', beginAtZero:true, max:trLy, grid:{display:false}, border:{display:false}, ticks:{stepSize:trLy / 4}},
+            y2:{display:false, beginAtZero:true, max:trGia}}}});
+      $('lgHrHs').innerHTML = ks.length ? `<span><i style="background:${c2}"></i>Doanh thu / giờ lương (đường, trục trái) · cả kỳ ${fmt(tdt / tg)} đ</span><span><i style="background:${s1}"></i>Ly / giờ lương (cột, trục phải) · cả kỳ ${f1(tly / tg)} ly</span><span><i style="background:${s2}"></i>Giá TB / ly (đường trên cùng) · cả kỳ ${tly ? fmt(tdt / tly) + ' đ' : '—'}</span>` : '<span>Chưa có ca nhân viên trong kỳ</span>';
       const ds = Object.values(nguoi).filter(p => p.g > 0).sort((a, b) => b.dt / b.g - a.dt / a.g);
       $('hrHsNguoi').innerHTML = ds.length ? '<b>Từng người:</b> ' + ds.map(p => `${esc(p.ten)} <b>${fmt(p.dt / p.g)} đ</b> · ${f1(p.ly / p.g)} ly / giờ lương (${f1(p.g)} giờ)`).join(' · ') : '';
     } }
