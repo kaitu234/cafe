@@ -3895,7 +3895,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.328';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.329';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -3953,6 +3953,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.329', ngay:'23/11/2026', nd:['Lịch làm theo đợt: Lọc tháng mặc định tháng hiện tại, thêm nút Tháng trước · Tháng này · Tháng sau (vẫn có ô chọn tháng và Từ hôm nay); xem được tháng cũ theo chấm công']},
   {v:'v1.7.328', ngay:'23/11/2026', nd:['Nhân sự: bảng nhân viên bỏ cột Trễ cho gọn']},
   {v:'v1.7.327', ngay:'23/11/2026', nd:['Tài khoản nhân viên: chỉ còn 1 loại giờ, gọi là Giờ công (= giờ danh nghĩa: giờ trong ca + OT được duyệt), bỏ giờ có mặt thật ở Nhân sự, Hôm nay, thẻ Của tôi']},
   {v:'v1.7.326', ngay:'23/11/2026', nd:['Nhân sự: bảng nhân viên xếp lại — Dậy sớm, Chuyên cần, Thưởng ly vào cụm tiền; cộng ngang từ Lương giờ là ra Thực nhận (Lương giờ = Tiền công bot trừ dậy sớm); Ly, Trễ nằm cạnh giờ']},
@@ -4922,15 +4923,19 @@ function renderLichDot(){
   const MAU = ['#F4C04D', '#7DB7EA', '#93CF9F', '#E8A5A5', '#C9A8E0', '#9FD3D6'], mau = nv => MAU[Math.max(0, ten.indexOf(nv)) % MAU.length];
   /* v1.7.294 (chủ nhờ 19/11): lọc lịch theo người + theo tháng — LICH_LOC giữ lựa chọn giữa các lần vẽ lại; tháng = cả tháng đó (ngày đã qua lấy chấm công như cũ) */
   const LC = window.LICH_LOC = window.LICH_LOC || {nv:'', th:''}; window.LICH_TEN = ten;
-  const thangs = [...new Set(L.dk.filter(x => x.tt === 'OK' && x.k >= tk.slice(0, 8) + '01' && x.k <= den).map(x => x.k.slice(0, 7)))].sort();
+  const thangs = [...new Set(L.dk.filter(x => x.tt === 'OK' && x.k >= tk.slice(0, 8) + '01' && x.k <= den).map(x => x.k.slice(0, 7)).concat(D.cong.filter(c => !c.goc && c.k <= tk).map(c => c.k.slice(0, 7)), [tk.slice(0, 7)]))].sort();   /* v1.7.329 (chủ 23/11): gồm tháng cũ (theo chấm công) */
   LC.nv = S.nv; if (LC.nv && !ten.includes(LC.nv)) ten.push(LC.nv);   // v1.7.299: người = bộ lọc Nhân viên chung
-  { const p = hrThangChon(); LC.th = p && (p.tu === 'lich' || p.m > tk.slice(0, 7)) ? p.m : ''; } if (LC.th && !thangs.includes(LC.th)) LC.th = '';   // tháng: chọn ở thẻ lịch, hoặc tháng sau chọn ở Ai làm ngày nào
+  LC.th = LC.tuNay === kyKhoa() && !hrThangChon() ? '' : hrThangChung(); if (LC.th && !thangs.includes(LC.th)) LC.th = tk.slice(0, 7);   // v1.7.329 (chủ 23/11): mặc định THÁNG HIỆN TẠI (theo Kỳ xem / tháng chọn ở Ai làm ngày nào); chỉ khi chủ chọn "Từ hôm nay" mới xem từ hôm nay
   const hopNv = nv => !LC.nv || nv === LC.nv, thBd = LC.th ? LC.th + '-01' : '', thKt = LC.th ? LC.th + '-' + p2(new Date(+LC.th.slice(0, 4), +LC.th.slice(5, 7), 0).getDate()) : '';
-  const Rf = LC.th ? lichDotCore(L.dk.filter(x => !(x.id && L.gocId.has(String(x.id)))), L.ca, thBd > tk ? thBd : tk, thKt, nv => luongMap[nv], ccNow) : R;
+  /* v1.7.329: tháng đã qua — đợt / ngày / giờ lấy từ chấm công (mỗi người mỗi ngày 1 lần), không có chuỗi dự kiến */
+  const thCu = LC.th && LC.th < tk.slice(0, 7), dkCu = thCu ? [...new Map(D.cong.filter(c => !c.goc && c.k.slice(0, 7) === LC.th).map(c => [c.k + '|' + c.nv, {k:c.k, nv:c.nv, ca:L.ca[0].ma, tt:'OK'}])).values()] : [];
+  if (thCu) dkCu.forEach(x => { if (!ten.includes(x.nv)) ten.push(x.nv); });
+  const Rf = thCu ? lichDotCore(dkCu, L.ca, thBd, thKt, nv => luongMap[nv], null) : LC.th ? lichDotCore(L.dk.filter(x => !(x.id && L.gocId.has(String(x.id)))), L.ca, thBd > tk ? thBd : tk, thKt, nv => luongMap[nv], ccNow) : R;
   if (LC.th && thBd > tk){ const Rc = lichDotCore(L.dk.filter(x => !(x.id && L.gocId.has(String(x.id)))), L.ca, tk, thKt, nv => luongMap[nv], ccNow);   /* tháng sau: chuỗi chuyên cần tính nối từ hôm nay (gồm ca còn lại tháng này), chỉ hiện mốc đạt trong tháng chọn */
     Rf.tong.forEach(t => { const c = Rc.tong.find(x => x.nv === t.nv); if (c && c.du) t.du = {nay:c.du.nay, dat:c.du.dat.filter(k => k.slice(0, 7) === LC.th), cuoi:c.du.cuoi}; }); }
   const nut = (js, chon, nhan, nen) => `<button type="button" onclick="${js}" style="margin:2px;padding:4px 10px;border-radius:14px;cursor:pointer;font:inherit;font-size:13px;border:${chon ? '2px solid #5E3B25' : '1px solid var(--line)'};background:${nen || 'var(--surface)'};color:${nen ? '#5E3B25' : 'var(--ink)'};font-weight:${chon ? 700 : 500};opacity:${chon || !nen ? 1 : .7}">${esc(nhan)}</button>`;
-  const loc = `<div style="margin-bottom:10px"><b>Lọc người:</b> ${nut("datNvChung('')", !LC.nv, 'Mọi người')}${ten.map((nv, i) => nut(`datNvChung(LICH_TEN[${i}])`, LC.nv === nv, nv, mau(nv))).join('')}<br><label class="lbl" for="lichTh" style="margin-right:6px"><b>Lọc tháng:</b></label><select id="lichTh" onchange="datHrThang(this.value, 'lich')"><option value=""${LC.th ? '' : ' selected'}>Từ hôm nay</option>${thangs.map(t => `<option value="${t}"${LC.th === t ? ' selected' : ''}>${mlabel(t)}</option>`).join('')}</select></div>`;
+  const loc = `<div style="margin-bottom:10px"><b>Lọc người:</b> ${nut("datNvChung('')", !LC.nv, 'Mọi người')}${ten.map((nv, i) => nut(`datNvChung(LICH_TEN[${i}])`, LC.nv === nv, nv, mau(nv))).join('')}<br><label class="lbl" for="lichTh" style="margin-right:6px"><b>Lọc tháng:</b></label><select id="lichTh" onchange="datLichThang(this.value)"><option value=""${LC.th ? '' : ' selected'}>Từ hôm nay</option>${thangs.map(t => `<option value="${t}"${LC.th === t ? ' selected' : ''}>${mlabel(t)}</option>`).join('')}</select>${(() => { const nay = tk.slice(0, 7), i = thangs.indexOf(LC.th || nay), b = (id, v, nhan) => `<button type="button" id="${id}"${v ? ` onclick="datLichThang('${v}')"` : ' disabled'}>${nhan}</button>`;
+    return `<div class="presets" style="display:inline-flex;margin-left:8px;vertical-align:middle">${b('lichTruoc', thangs[i - 1], '◀ Tháng trước')}${b('lichNay', LC.th === nay ? '' : nay, 'Tháng này')}${b('lichSau', thangs[i + 1], 'Tháng sau ▶')}</div>`; })()}</div>`;
   const chip = (nv, tt) => `<span style="display:inline-block;background:${mau(nv)};color:#5E3B25;border-radius:6px;padding:3px 8px;margin:1px 2px;font-weight:600">${esc(nv)}${tt === 'xong' || tt === 'dang' ? ' ✓' : tt === 'vang' ? ' ✗' : ''}</span>`;
   // v1.7.191 (chủ nhờ 11/11): ngày đã qua + hôm nay lấy từ lịch đối chiếu chấm công (✓ có chấm công · ✗ vắng), như thẻ Lịch làm cũ
   const now = new Date(), nowMin = now.getHours() * 60 + now.getMinutes(), daLam = k => lichCaNgay(L, D.cong, k, tk, nowMin).flatMap(c => c.nghi ? [] : c.ai).filter(a => !a.goc);   // v1.7.194: ẩn chủ gốc
@@ -5044,6 +5049,8 @@ function hrThangChung(){ const p = hrThangChon(); return p ? p.m : (S.to || toda
 function datHrThang(m, tu){ const cur = today().slice(0, 7);
   if (m && m <= cur && !(D && D.first && m < D.first.slice(0, 7))){ S.gKy = 'thang'; S.gMoc = m === cur ? '' : m + '-01'; gKyTinh(); }
   S.hrTh = m ? {m, tu, ky:kyKhoa()} : null; syncFilters(); render(); }
+/* v1.7.329: ô Lọc tháng của Lịch làm theo đợt — '' = Từ hôm nay (nhớ theo Kỳ xem, đổi kỳ là về tháng) */
+function datLichThang(v){ (window.LICH_LOC = window.LICH_LOC || {nv:'', th:''}).tuNay = v ? '' : kyKhoa(); datHrThang(v, 'lich'); }
 function datNvChung(nv){ S.nv = nv || ''; syncFilters(); render(); }
 /** v1.7.95 — Ai làm ngày nào (chủ nhờ 03/11): lưới tháng T2–CN từ ChamCong, chọn được tháng cũ; ngày đã qua có lịch (DangKyCa OK) mà không chấm công → ✗ vắng */
 function renderAiLam(){
