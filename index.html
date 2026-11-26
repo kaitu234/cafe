@@ -710,6 +710,13 @@ button,a,.presets button,.jnav a{touch-action:manipulation;-webkit-tap-highlight
 .pl-bar b{font-family:var(--f-display);letter-spacing:.06em;text-transform:uppercase;font-size:15px;margin-right:auto}
 .pl-bar select,.pl-bar button{font:inherit;font-size:13px;border-radius:8px;border:1px solid #6b4f3a;background:#3a291d;color:#fff;padding:6px 10px}
 .pl-bar button.in{background:#B7793A;border-color:#B7793A;font-weight:700}
+#plAnh{position:fixed;inset:0;z-index:310;background:rgba(20,13,8,.85);overflow:auto;padding:0 0 30px;text-align:center}
+#plAnh[hidden]{display:none}
+.pl-anh-bar{position:sticky;top:0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:flex-end;padding:10px 16px;background:#2b1d14;color:#fff;font-size:13px}
+.pl-anh-bar span{margin-right:auto;text-align:left}
+.pl-anh-bar button,.pl-anh-bar a{font:inherit;font-size:13px;border-radius:8px;border:1px solid #B7793A;background:#B7793A;color:#fff;padding:6px 12px;text-decoration:none;font-weight:700;cursor:pointer}
+.pl-anh-bar #plAnhDong{background:#3a291d;border-color:#6b4f3a}
+#plAnhImg{max-width:min(794px,calc(100% - 16px));margin:16px auto 0;display:block;box-shadow:0 10px 40px rgba(0,0,0,.4);background:#fff}
 .pl-stage{display:flex;justify-content:center;padding:18px 8px}
 .pl{width:794px;min-height:1123px;box-sizing:border-box;background:#fff;color:#2b1d14;font:12px/1.45 'Be Vietnam Pro',Arial,sans-serif;padding:34px 44px 30px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.35);display:flex;flex-direction:column}
 .pl *{box-sizing:border-box}
@@ -4075,7 +4082,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.359';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.360';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4133,6 +4140,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.360', ngay:'26/11/2026', nd:['Phiếu lương: thêm nút 🖼 Ảnh PNG — xem phiếu dạng ảnh, Copy ảnh để dán vào Zalo / Telegram hoặc tải file PNG']},
   {v:'v1.7.359', ngay:'26/11/2026', nd:['Nhân sự: thêm Phiếu lương in A4 kiểu công ty — chọn người + kỳ, đủ thu nhập / khấu trừ / thực lĩnh bằng chữ / bảng chấm công / chỗ ký; nút In / Lưu PDF. Nhân viên chỉ in được phiếu của mình']},
   {v:'v1.7.358', ngay:'23/11/2026', nd:['PNL, Báo cáo: tuần / 7 ngày vắt qua đầu tháng không còn bị trừ nguyên khoản phân bổ cả tháng mới (chia theo ngày); xem tháng và Tất cả giữ nguyên số', 'PNL: bảng từng ngày luôn cùng cách chia với tổng của kỳ; chữ bao bì phụ ghi đúng cách phân bổ']},
   {v:'v1.7.357', ngay:'23/11/2026', nd:['💵 Tiền mặt theo đợt làm việc: chỉ hiện tháng đang xem, đợt vắt 2 tháng tính riêng từng tháng']},
@@ -6138,7 +6146,22 @@ function renderPLCard(){
     $('plKy2').onchange = () => { PL.tu = $('plKy2').value.split('|')[0]; plVe(); };
     $('plDong').onclick = () => { $('plWrap').hidden = true; document.documentElement.classList.remove('plIn'); renderPLCard(); };
     $('plIn').onclick = () => window.print();
+    $('plPng').onclick = () => plPng();
+    $('plAnhDong').onclick = () => { $('plAnh').hidden = true; };
+    $('plAnhCopy').onclick = async () => { try { await navigator.clipboard.write([new ClipboardItem({'image/png': PL.blob})]); $('plAnhNt').textContent = '✔ Đã copy ảnh — dán (Ctrl+V) vào Zalo / Telegram'; } catch(e){ $('plAnhNt').textContent = 'Trình duyệt không cho copy tự động — nhấn chuột phải (hoặc giữ tay trên điện thoại) vào ảnh → Sao chép hình ảnh'; } };
     addEventListener('resize', plCo); }
+}
+/* v1.7.360 (chủ 26/11): xuất phiếu ra ảnh PNG (html2canvas tải khi cần, cdnjs) — xem ảnh, Copy ảnh vào clipboard hoặc tải file */
+function plTaiH2C(){ return window.html2canvas ? Promise.resolve() : new Promise((ok, loi) => { const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'; sc.onload = ok; sc.onerror = () => loi(new Error('không tải được html2canvas')); document.head.appendChild(sc); }); }
+async function plPng(){
+  const anh = $('plAnh'), nt = $('plAnhNt'), img = $('plAnhImg'), tai = $('plAnhTai'); anh.hidden = false; nt.textContent = 'Đang tạo ảnh…'; img.removeAttribute('src'); tai.removeAttribute('href'); PL.blob = null;
+  const box = document.createElement('div'); box.style.cssText = 'position:absolute;left:-10000px;top:0;width:794px'; const cl = $('plTo').cloneNode(true); cl.removeAttribute('id'); cl.style.zoom = '1'; cl.style.boxShadow = 'none'; box.appendChild(cl); document.body.appendChild(box);
+  try { await plTaiH2C(); if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const cv = await html2canvas(cl, {scale:2, backgroundColor:'#ffffff', useCORS:true, logging:false, windowWidth:900});
+    const blob = await new Promise(r => cv.toBlob(r, 'image/png')); PL.blob = blob; const url = URL.createObjectURL(blob);
+    img.src = url; tai.href = url; tai.download = document.title.replace(/[^p{L}d -]/gu, '').trim().replace(/ +/g, '-') + '.png';
+    nt.textContent = 'Ảnh phiếu lương · bấm Copy ảnh rồi dán, hoặc tải file PNG';
+  } catch(e){ nt.textContent = '⚠ Không tạo được ảnh: ' + e.message; } finally { box.remove(); }
 }
 function plCo(){ const el = $('plTo'); if (el && !$('plWrap').hidden) el.style.zoom = Math.min(1, (innerWidth - 16) / 794).toFixed(3); }
 function plVe(){
@@ -7811,6 +7834,6 @@ function khoiTaoDiDong(){
 })();
 </script>
 
-<div id="plWrap" hidden role="dialog" aria-label="Phiếu lương"><div class="pl-bar"><b>Phiếu lương</b><select id="plNv2" aria-label="Nhân viên"></select><select id="plKy2" aria-label="Kỳ lương"></select><button class="in" id="plIn" type="button">🖨 In / Lưu PDF</button><button id="plDong" type="button">✕ Đóng</button></div><div class="pl-stage"><div class="pl" id="plTo"></div></div></div>
+<div id="plWrap" hidden role="dialog" aria-label="Phiếu lương"><div class="pl-bar"><b>Phiếu lương</b><select id="plNv2" aria-label="Nhân viên"></select><select id="plKy2" aria-label="Kỳ lương"></select><button class="in" id="plIn" type="button">🖨 In / Lưu PDF</button><button class="in" id="plPng" type="button">🖼 Ảnh PNG</button><button id="plDong" type="button">✕ Đóng</button></div><div class="pl-stage"><div class="pl" id="plTo"></div></div><div id="plAnh" hidden><div class="pl-anh-bar"><span id="plAnhNt">Đang tạo ảnh…</span><button type="button" id="plAnhCopy">📋 Copy ảnh</button><a id="plAnhTai" download>⬇ Tải PNG</a><button type="button" id="plAnhDong">✕</button></div><img id="plAnhImg" alt="Phiếu lương dạng ảnh"></div></div>
 </body>
 </html>
