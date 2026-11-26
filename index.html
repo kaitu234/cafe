@@ -754,9 +754,12 @@ button,a,.presets button,.jnav a{touch-action:manipulation;-webkit-tap-highlight
 .pl-cc tr.tong td{background:#F3EADB;font-weight:700}
 .pl-nt{margin:12px 0 0;font-size:10px;color:#6b5240;line-height:1.55}
 .pl-nt b{color:#2b1d14}
-.pl-ky{margin-top:auto;padding-top:18px;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:11px}
+.pl-ky{padding-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:11px}
 .pl-ky b{display:block;font:700 12px/1.3 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase}
-.pl-ky i{display:block;font-size:9.5px;color:#8a6b55;margin-bottom:58px}
+.pl-ky i{display:block;font-size:9.5px;color:#8a6b55;margin-bottom:54px}
+.pl-sec.pl-pl{margin-top:22px}
+.pl-ft{margin-top:auto!important}
+.pl-cc tr{break-inside:avoid}
 .pl-ft{margin-top:14px;padding-top:6px;border-top:1px solid #cbb79c;display:flex;justify-content:space-between;font-size:9px;color:#8a6b55}
 @media print{
   @page{size:A4;margin:0}
@@ -6049,7 +6052,7 @@ function plData(id, ky){
   const nv = (D.nhanVien || []).find(n => n.id === id) || {}, thuViec = /^th(ử|u) vi(ệ|e)c$/i.test(nv.chucVu || '');
   const cas = D.cong.filter(c => c.id === id && c.k >= ky.tu && c.k <= ky.den).sort((a, b) => a.vao - b.vao);
   let gio = 0, base = 0, tn = 0, som = 0, mot = 0, cc = 0, tl = 0, tam = 0, ot = 0;
-  const dong = cas.map(c => { const het = c.ra || gioRaTam(c), phut = c.ra && c.phutL != null ? c.phutL : het ? gioLuong(c, het) * 60 : 0;
+  const dong = cas.map(c => { const het = c.ra || gioRaTam(c), phut = c.ra && c.phutL != null ? c.phutL : het ? Math.floor(gioLuong(c, het) * 60 + 1e-6) : 0;
     let tien = c.tien; if (tien == null){ tam++; tien = c.luongGio ? Math.round(phut / 60 * c.luongGio) : 0; }
     const t = thuViec ? 0 : Math.round(phut / 60 * (c.tnG || 0)), s0 = !thuViec && c.som && tien > 0 ? PHU_CAP.som : 0, m0 = !thuViec && c.mot && tien > 0 ? PHU_CAP.mot : 0;
     gio += phut / 60; tn += t; som += s0 ? 1 : 0; mot += m0 ? 1 : 0; base += tien - t - s0 - m0; cc += c.cc || 0; tl += c.tl || 0; ot += c.otTinh || 0;
@@ -6064,8 +6067,8 @@ function plData(id, ky){
   if (cc) thu.push(['Thưởng chuyên cần', 'Đạt chuỗi ca đúng giờ', Math.round(cc / 50000) + ' lần', 50000, cc]);
   if (tl) thu.push(['Thưởng số ly theo ngày', 'Ngày quán đạt mốc 40 / 50 / 60 ly', dong.filter(d => d.tl).length + ' ngày', null, tl]);
   tp.forEach(x => { const dc = /^Điều chỉnh:/i.test(x.lyDo || ''), ly = (x.lyDo || '').replace(/^Điều chỉnh:\s*/i, '');
-    if (x.tien >= 0 && x.loai !== 'PHAT') thu.push([dc ? 'Điều chỉnh tăng' : 'Thưởng', (ly || 'Thưởng của chủ quán') + ' · ' + dShort(x.k), '1 lần', null, x.tien]);
-    else tru.push([dc ? 'Điều chỉnh giảm' : 'Phạt / vi phạm', (ly || 'Vi phạm nội quy') + ' · ' + dShort(x.k), '1 lần', null, -x.tien]); });
+    if (x.tien >= 0 && x.loai !== 'PHAT') thu.push([dc ? 'Điều chỉnh tăng' : 'Thưởng', (ly || 'Thưởng của chủ quán') + (ly.includes(dShort(x.k)) ? '' : ' · ' + dShort(x.k)), '1 lần', null, x.tien]);
+    else tru.push([dc ? 'Điều chỉnh giảm' : 'Phạt / vi phạm', (ly || 'Vi phạm nội quy') + (ly.includes(dShort(x.k)) ? '' : ' · ' + dShort(x.k)), '1 lần', null, -x.tien]); });
   const I = thu.reduce((a, r) => a + r[4], 0), II = tru.reduce((a, r) => a + r[4], 0);
   const chot = (D.luongChot || []).find(x => x.id === id && x.tu === ky.tu && x.den === ky.den);
   const k0 = D.cong.filter(c => c.id === id).map(c => c.k).sort()[0];
@@ -6099,12 +6102,12 @@ function plHtml(id, ky){
   <table class="pl-tb">${head}${tb(P.tru, 'Không có khoản khấu trừ trong kỳ')}<tr class="tong"><td></td><td colspan="4">Tổng khấu trừ (II)</td><td class="num">${P.II ? '−' + fmt(P.II) : '0'}</td></tr></table>
   <div class="pl-net"><div class="l">Thực lĩnh (I − II)<small>Net pay · số tiền nhận trong kỳ</small></div><div class="v">${fmt(P.net)}<span>VNĐ</span></div></div>
   <div class="pl-chu">Bằng chữ: <b>${plDocSo(P.net)}</b>.</div>
-  <div class="pl-sec">III. Bảng chấm công chi tiết <i>ATTENDANCE</i></div>
+  <p class="pl-nt"><b>Ghi chú:</b> Giờ tính công = giờ trong ca + phút vào sớm (tối đa 30 phút/ca) + OT chủ quán duyệt; về muộn không duyệt không tính. Tiền công từng ca gồm căn bản, thâm niên và phụ cấp; cột tiền công đã cộng thưởng chuyên cần (CC) và thưởng ly của ca đó.${P.tam ? ' Có ' + P.tam + ' ca chưa check-out đang tính tạm tới giờ ra dự kiến.' : ''}${P.chot && Math.abs((P.chot.thuc || 0) - P.net) > 1 && P.chot.thuc ? ' <b>Số lúc chốt: ' + fmt(P.chot.thuc) + ' đ.</b>' : ''} Thắc mắc về phiếu lương vui lòng phản hồi chủ quán trong <b>03 ngày</b> kể từ ngày nhận.</p>
+  <div class="pl-ky"><div><b>Người lập phiếu</b><i>(Ký, ghi rõ họ tên)</i>Kai Bot · hệ thống</div><div><b>Chủ quán duyệt</b><i>(Ký, ghi rõ họ tên)</i>${esc(chuTen)}</div><div><b>Người nhận lương</b><i>(Ký, ghi rõ họ tên)</i>${esc(nv.ten || '')}</div></div>
+  <div class="pl-sec pl-pl">Phụ lục · Bảng chấm công chi tiết <i>ATTENDANCE</i></div>
   <table class="pl-cc"><tr><th class="c">#</th><th>Ngày</th><th class="c">Thứ</th><th class="c">Vào</th><th class="c">Ra</th><th class="num">Giờ công</th><th class="num">OT (phút)</th><th>Ghi chú</th><th class="num">Tiền công</th></tr>
     ${P.dong.map((d, i) => `<tr><td class="c">${i + 1}</td><td>${dShort(d.c.k)}</td><td class="c">${THU[fromKey(d.c.k).getDay()]}</td><td class="c">${hm(d.c.vao)}</td><td class="c">${d.c.ra ? hm(d.c.ra) : '—'}</td><td class="num">${gp(d.phut)}</td><td class="num">${d.c.otTinh || ''}</td><td>${esc(nt(d))}</td><td class="num">${fmt(d.tien + d.ccT + d.tl)}</td></tr>`).join('')}
     <tr class="tong"><td></td><td colspan="4">Cộng ${P.cas.length} ca</td><td class="num">${gp(P.gio * 60)}</td><td class="num">${fmt(P.ot)}</td><td></td><td class="num">${fmt(P.dong.reduce((a, d) => a + d.tien + d.ccT + d.tl, 0))}</td></tr></table>
-  <p class="pl-nt"><b>Ghi chú:</b> Giờ tính công = giờ trong ca + phút vào sớm (tối đa 30 phút/ca) + OT chủ quán duyệt; về muộn không duyệt không tính. Tiền công từng ca gồm căn bản, thâm niên và phụ cấp; cột tiền công đã cộng thưởng chuyên cần (CC) và thưởng ly của ca đó.${P.tam ? ' Có ' + P.tam + ' ca chưa check-out đang tính tạm tới giờ ra dự kiến.' : ''}${P.chot && Math.abs((P.chot.thuc || 0) - P.net) > 1 && P.chot.thuc ? ' <b>Số lúc chốt: ' + fmt(P.chot.thuc) + ' đ.</b>' : ''} Thắc mắc về phiếu lương vui lòng phản hồi chủ quán trong <b>03 ngày</b> kể từ ngày nhận.</p>
-  <div class="pl-ky"><div><b>Người lập phiếu</b><i>(Ký, ghi rõ họ tên)</i>Kai Bot · hệ thống</div><div><b>Chủ quán duyệt</b><i>(Ký, ghi rõ họ tên)</i>${esc(chuTen)}</div><div><b>Người nhận lương</b><i>(Ký, ghi rõ họ tên)</i>${esc(nv.ten || '')}</div></div>
   <div class="pl-ft"><span>Kai Café · Phiếu lương nội bộ · ${ma}</span><span>Số liệu tự động từ chấm công bot · Dashboard ${BAN_DASH} · in ${hm(now)} ${p2(now.getDate())}/${p2(now.getMonth() + 1)}/${now.getFullYear()}</span></div>`;
 }
 function plNguoi(){
