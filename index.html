@@ -701,6 +701,71 @@ button,a,.presets button,.jnav a{touch-action:manipulation;-webkit-tap-highlight
 .cmt-more{display:none}
 @media (max-width:899px){.cmt-more{display:inline-flex;align-items:center}.cmt-more[hidden]{display:none}}
 
+/* ---------- v1.7.359 phiếu lương (in A4, màu cố định không theo giao diện tối) ---------- */
+#plWrap{position:fixed;inset:0;z-index:300;background:rgba(30,20,12,.62);overflow:auto;padding:0 0 40px}
+#plWrap[hidden]{display:none}
+.pl-bar{position:sticky;top:0;z-index:2;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 16px;background:#2b1d14;color:#fff}
+.pl-bar b{font-family:var(--f-display);letter-spacing:.06em;text-transform:uppercase;font-size:15px;margin-right:auto}
+.pl-bar select,.pl-bar button{font:inherit;font-size:13px;border-radius:8px;border:1px solid #6b4f3a;background:#3a291d;color:#fff;padding:6px 10px}
+.pl-bar button.in{background:#B7793A;border-color:#B7793A;font-weight:700}
+.pl-stage{display:flex;justify-content:center;padding:18px 8px}
+.pl{width:794px;min-height:1123px;box-sizing:border-box;background:#fff;color:#2b1d14;font:12px/1.45 'Be Vietnam Pro',Arial,sans-serif;padding:34px 44px 30px;position:relative;box-shadow:0 10px 40px rgba(0,0,0,.35);display:flex;flex-direction:column}
+.pl *{box-sizing:border-box}
+.pl:before{content:"";position:absolute;left:0;right:0;top:0;height:8px;background:#5E3B25;border-bottom:3px solid #B7793A}
+.pl .num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pl .c{text-align:center}
+.pl-hd{display:grid;grid-template-columns:1.15fr 1.3fr 1fr;gap:14px;align-items:center;padding:14px 0 14px;border-bottom:2px solid #5E3B25}
+.pl-co .blogo{width:118px;display:block;margin-bottom:4px}
+.pl .blogo .lf{fill:#5E3B25} .pl .blogo .lp{fill:#fff} .pl .blogo .lps{fill:none;stroke:#fff} .pl .blogo .ls{fill:none;stroke:#5E3B25}
+.pl-co div{font-size:10.5px;color:#6b5240;line-height:1.5}
+.pl-co div b{color:#2b1d14;font-size:11.5px;letter-spacing:.04em}
+.pl-tt{text-align:center}
+.pl-tt h1{margin:0;font:700 34px/1 'Barlow Condensed','Arial Narrow',sans-serif;letter-spacing:.12em;color:#5E3B25}
+.pl-tt .en{font:600 11px/1 'Barlow Condensed',sans-serif;letter-spacing:.42em;color:#B7793A;margin:5px 0 7px}
+.pl-tt .ky{display:inline-block;border:1px solid #5E3B25;padding:3px 12px;font:600 13px/1.3 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.pl-meta{border:1px solid #cbb79c;font-size:10.5px}
+.pl-meta div{display:flex;justify-content:space-between;gap:8px;padding:4px 8px;border-bottom:1px solid #e6d9c6}
+.pl-meta div:last-child{border-bottom:0}
+.pl-meta span{color:#6b5240} .pl-meta b{font-variant-numeric:tabular-nums}
+.pl-st{display:inline-block;padding:1px 7px;border-radius:2px;font:700 10px/1.5 'Barlow Condensed',sans-serif;letter-spacing:.1em;color:#fff;background:#3c7a4e}
+.pl-st.tam{background:#B7793A}
+.pl-conf{position:absolute;top:18px;right:44px;font:700 9px/1 'Barlow Condensed',sans-serif;letter-spacing:.24em;color:#a33;border:1px solid #a33;padding:3px 6px}
+.pl-sec{margin:14px 0 0;display:flex;align-items:center;justify-content:space-between;background:#5E3B25;color:#fff;padding:5px 10px;font:700 12.5px/1.2 'Barlow Condensed',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+.pl-sec i{font-style:normal;font-weight:500;opacity:.75;letter-spacing:.2em;font-size:10px}
+.pl table{width:100%;border-collapse:collapse}
+.pl td,.pl th{border:1px solid #cbb79c;padding:5px 7px;vertical-align:top}
+.pl th{background:#F3EADB;font:700 10.5px/1.25 'Barlow Condensed',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#5E3B25;text-align:left}
+.pl th.num{text-align:right}
+.pl-info td{width:25%;font-size:11.5px} .pl-info td.k{background:#FAF5EC;color:#6b5240;font-size:10.5px;width:17%}
+.pl-info td.v{font-weight:600;width:33%}
+.pl-tb td{font-size:11.5px} .pl-tb td.dg{color:#6b5240;font-size:10.5px}
+.pl-tb tr.tong td{background:#F3EADB;font-weight:700}
+.pl-tb tr.tong td.num{font-size:13px}
+.pl-net{margin-top:14px;border:2px solid #5E3B25;display:grid;grid-template-columns:1fr auto}
+.pl-net .l{padding:9px 12px;background:#5E3B25;color:#fff;font:700 15px/1.2 'Barlow Condensed',sans-serif;letter-spacing:.12em;text-transform:uppercase}
+.pl-net .l small{display:block;font:400 10.5px/1.4 'Be Vietnam Pro',sans-serif;letter-spacing:0;text-transform:none;opacity:.8}
+.pl-net .v{padding:6px 14px;font:700 30px/1.1 'Barlow Condensed',sans-serif;color:#5E3B25;display:flex;align-items:center;font-variant-numeric:tabular-nums}
+.pl-net .v span{font-size:15px;margin-left:5px}
+.pl-chu{border:1px solid #cbb79c;border-top:0;padding:6px 12px;font-size:11.5px;font-style:italic;background:#FAF5EC}
+.pl-cc td,.pl-cc th{padding:3px 6px;font-size:10.5px}
+.pl-cc tr:nth-child(even) td{background:#FCF9F3}
+.pl-cc tr.tong td{background:#F3EADB;font-weight:700}
+.pl-nt{margin:12px 0 0;font-size:10px;color:#6b5240;line-height:1.55}
+.pl-nt b{color:#2b1d14}
+.pl-ky{margin-top:auto;padding-top:18px;display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;font-size:11px}
+.pl-ky b{display:block;font:700 12px/1.3 'Barlow Condensed',sans-serif;letter-spacing:.08em;text-transform:uppercase}
+.pl-ky i{display:block;font-size:9.5px;color:#8a6b55;margin-bottom:58px}
+.pl-ft{margin-top:14px;padding-top:6px;border-top:1px solid #cbb79c;display:flex;justify-content:space-between;font-size:9px;color:#8a6b55}
+@media print{
+  @page{size:A4;margin:0}
+  html.plIn body>*:not(#plWrap){display:none!important}
+  html.plIn,html.plIn body{background:#fff!important}
+  html.plIn #plWrap{position:static;background:none;padding:0;overflow:visible}
+  html.plIn .pl-bar{display:none!important}
+  html.plIn .pl-stage{padding:0;display:block}
+  html.plIn .pl{box-shadow:none;zoom:1!important;width:210mm;min-height:297mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+
 /* ---------- in ---------- */
 html.mcap body{max-width:480px;margin:0 auto;box-shadow:0 0 0 1px var(--line),0 0 40px rgba(94,59,37,.12)}
 html.mcap .bnav{left:50%;right:auto;width:min(480px,100%);transform:translateX(-50%)}
@@ -1551,6 +1616,13 @@ html.mcap{background:var(--paper)}
       <div class="tblwrap" style="max-height:360px"><table id="tHrNk"></table></div>
     </div>
     <div class="kpis" id="hrTop"></div>
+    <div class="card" id="sec-hr-pl" data-nvok>
+      <div class="ct">Phiếu lương <span class="nt">· mẫu in A4 kiểu công ty · lấy từ chấm công + thưởng/phạt của bot · kỳ chưa chốt là số tạm tính</span></div>
+      <div class="pl-chon" style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <select id="plNv" aria-label="Nhân viên"></select><select id="plKy" aria-label="Kỳ lương"></select>
+        <button class="cbtn" id="plMo" type="button">🧾 Xem &amp; in phiếu lương</button>
+      </div>
+    </div>
     <div class="card" id="sec-hr-hs" hidden>
       <div class="ct">Hiệu suất theo giờ lương <span class="nt">· mỗi ngày: doanh thu và ly bán trong ca nhân viên ÷ giờ tính lương (trong ca + vào sớm) · đường trên cùng = giá TB / ly · không tính chủ · theo bộ lọc kỳ + nhân viên</span></div>
       <div class="cw"><canvas id="cHrHs" aria-label="Doanh thu và số ly trên mỗi giờ lương, giá trung bình mỗi ly theo ngày"></canvas></div>
@@ -1842,7 +1914,7 @@ function parseWorkbook(wb){
   rowsOf(wb, 'ChamCong').slice(1).forEach(r => { const k = dayKey(r[0]); const vao = toDate(r[3]); if (!k || !vao) return;
     const ra = toDate(r[4]); D.cong.push({k, nv:txt(r[1]), id:txt(r[2]), vao, ra, gio: num(r[5]) || (ra ? (ra - vao)/36e5 : 0), note:txt(r[8]),
       phutL: r[9] == null || txt(r[9]) === '' ? null : num(r[9]), otTinh:num(r[10]), otBo:num(r[11]),   // v1.7.130: 🤖 Phút tính lương · OT tính · OT bỏ (bot caCong_)
-      luongGio:num(r[13]), tien: r[15] == null ? null : num(r[15]), cc:(m => m && !(r[15] != null && txt(r[15]) !== '' && num(r[15]) === 0) ? +m[1].replace(/\./g, '') : 0)(/\+\s*([\d.]+)\s*đ/.exec(txt(r[17]))), som:tick(r[16]), mot:tick(r[18]) && k < '2026-11-01', bu:tick(r[19]), tl:num(r[21])}); });   // v1.7.199: V = thưởng ly theo ngày (bot thuongly-v1, ở ca đầu của người đó trong ngày)
+      luongGio:num(r[13]), tnG:num(r[14]), tien: r[15] == null ? null : num(r[15]), cc:(m => m && !(r[15] != null && txt(r[15]) !== '' && num(r[15]) === 0) ? +m[1].replace(/\./g, '') : 0)(/\+\s*([\d.]+)\s*đ/.exec(txt(r[17]))), som:tick(r[16]), mot:tick(r[18]) && k < '2026-11-01', bu:tick(r[19]), tl:num(r[21])}); });   // v1.7.199: V = thưởng ly theo ngày (bot thuongly-v1, ở ca đầu của người đó trong ngày)
   // Cùng Telegram ID nhưng tên khác (tên Telegram trước khi /themnv) → gộp về tên mới nhất
   const tenMoi = {}, alias = {};
   D.cong.forEach(c => { if (c.id) tenMoi[c.id] = c.nv; });
@@ -3995,7 +4067,7 @@ function renderPlan(){
 
 /* ============ render: KIỂM CHỨNG (định lượng · công thức · dữ liệu cần thêm · tự kiểm) ============
  * Nguyên tắc: (1) "Data sẵn sàng?" trước khi tin số, (2) chỉ kết luận khi đủ mẫu, (3) giả định và điểm mù hiện ra ở UI, (4) tự kiểm bất biến bằng code chạy trên chính data đang xem. */
-const BAN_DASH = 'v1.7.358';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
+const BAN_DASH = 'v1.7.359';   // bump ĐỦ 3 chỗ: hằng này · dòng đầu CHANGELOG · (chip thanh bên và tiêu đề "Có gì mới" tự lấy từ đây); bất biến 19 kiểm điều này
 const KIEM_NL = {   // nguồn số đang dùng + độ tin cậy (1 ước tính · 2 Kai chốt · 3 có hoá đơn / ghi trên bao bì) + cách kiểm cho từng nguyên liệu (mã tab Kho)
   cf:{nguon:'Kai chốt 18g = 45ml, 1 kg ≈ 55 ly; giá 240.000 đ/kg (sổ chi ghi 0 đ vì được tặng 5kg → dùng giá tham chiếu)', tin:2, cach:'Cân 5 lần pha thực tế; sau 3 ngày gõ /kiemkho cf so với số ước tính'},
   cfb:{nguon:'Cà phê Phố Núi 1,5 kg · 375.000 đ – chưa có món nào dùng trong công thức', tin:1, cach:'Xác nhận món phin dùng cà phê hạt hay bột rồi điền cột cfb'},
@@ -4053,6 +4125,7 @@ const GLOSS_KAI = [   // định nghĩa & công thức mọi con số quan trọ
   ['Dự báo ngày mai', 'Chỉ lấy ngày cùng loại giá với ngày mai (giá thường / đồng giá 15K; chưa đủ 3 ngày thì bỏ ngày khai trương 10K) · TB các ngày cùng thứ gần nhất (≥ 2 ngày, thiếu thì TB 7 ngày) × hệ số khuyến mãi / mưa khi đủ dữ liệu', 'Đơn bot', 'Hiệu suất'],
 ];
 const CHANGELOG = [   // dòng đầu = bản hiện hành; mỗi bản nhiều ý ngắn · v1.7.176: chỉ giữ ~12 bản mới nhất ở đây, bản cũ hơn nằm ở changelog-cu.json (tải khi mở Kiểm chứng) — quá 20 bản thì chuyển bớt sang file đó (thêm vào ĐẦU mảng json)
+  {v:'v1.7.359', ngay:'26/11/2026', nd:['Nhân sự: thêm Phiếu lương in A4 kiểu công ty — chọn người + kỳ, đủ thu nhập / khấu trừ / thực lĩnh bằng chữ / bảng chấm công / chỗ ký; nút In / Lưu PDF. Nhân viên chỉ in được phiếu của mình']},
   {v:'v1.7.358', ngay:'23/11/2026', nd:['PNL, Báo cáo: tuần / 7 ngày vắt qua đầu tháng không còn bị trừ nguyên khoản phân bổ cả tháng mới (chia theo ngày); xem tháng và Tất cả giữ nguyên số', 'PNL: bảng từng ngày luôn cùng cách chia với tổng của kỳ; chữ bao bì phụ ghi đúng cách phân bổ']},
   {v:'v1.7.357', ngay:'23/11/2026', nd:['💵 Tiền mặt theo đợt làm việc: chỉ hiện tháng đang xem, đợt vắt 2 tháng tính riêng từng tháng']},
   {v:'v1.7.356', ngay:'23/11/2026', nd:['Chip đơn nhiều ly theo cỡ đơn: ✌️ đơn 2 · 🔥 đơn 3 · 🚀 đơn 4 · 👑 đơn 5 trở lên']},
@@ -5947,7 +6020,128 @@ function renderKaiFacts(){
     <div class="kf-grid">${X.join('')}</div>` : ''}
     <p class="kf-note"><b>Kỷ lục bán hàng chỉ tính ngày giá thường</b> (ly / giờ, ca kỷ lục, AOV, size L, thẻ, món tủ, đơn to nhất, giờ cháy, ngày kỷ lục, món số 1…): bỏ 10–16/10 đồng giá 10K và các ngày đồng giá 15K vì khách dồn, không phản ánh tay nghề. Tổng ly, ngày mở bán, giờ đứng quầy, gắn bó, đúng giờ, chốt két, kiểm kho vẫn tính từ ngày mở. Ly / giờ và ca kỷ lục: đơn nằm trong giờ ca của người đó (hai người chung ca thì cả hai cùng được tính). AOV, size L, thẻ, món tủ: theo người ghi đơn trên bot. Tuổi lấy từ tab NhanVien (chỉ người đang làm có ngày sinh).</p>`;
 }
+/* v1.7.359 (chủ 26/11/2026): PHIẾU LƯƠNG in A4 kiểu công ty / nhà máy — mỗi người mỗi kỳ.
+ * Số = đúng cách bot tính (cột P ChamCong = căn bản + thâm niên + dậy sớm + ca 1 người − trừ trễ; + chuyên cần cột R + thưởng ly cột V + ThuongPhat).
+ * Lương theo giờ công = P − thâm niên (phút × cột O) − dậy sớm − ca 1 người (phần còn lại, đã gồm trừ trễ nếu có). Kỳ: từ 11/2026 theo tháng, trước đó 01–15 / 16–cuối tháng. */
+function plKyList(id){
+  const ms = [...new Set(D.cong.filter(c => c.id === id).map(c => c.k.slice(0, 7)))].sort().reverse(), out = [];
+  ms.forEach(m => { const [y, mo] = m.split('-').map(Number), cuoi = m + '-' + p2(new Date(y, mo, 0).getDate());
+    if (m >= '2026-11') out.push({tu:m + '-01', den:cuoi, ten:'Tháng ' + p2(mo) + '/' + y});
+    else { out.push({tu:m + '-16', den:cuoi, ten:'16/' + p2(mo) + ' – ' + cuoi.slice(8) + '/' + p2(mo) + '/' + y}); out.push({tu:m + '-01', den:m + '-15', ten:'01/' + p2(mo) + ' – 15/' + p2(mo) + '/' + y}); } });
+  return out.filter(k => D.cong.some(c => c.id === id && c.k >= k.tu && c.k <= k.den));
+}
+function plDocSo(n){
+  n = Math.round(Math.abs(n || 0)); if (!n) return 'Không đồng';
+  const cs = ['không','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'], dv = ['', ' nghìn', ' triệu', ' tỷ'];
+  const doc3 = (x, du) => { const t = Math.floor(x / 100), c = Math.floor(x % 100 / 10), d = x % 10, r = [];
+    if (du || t) r.push(cs[t] + ' trăm');
+    if (c > 1){ r.push(cs[c] + ' mươi'); if (d === 1) r.push('mốt'); else if (d === 5) r.push('lăm'); else if (d) r.push(cs[d]); }
+    else if (c === 1){ r.push('mười'); if (d === 5) r.push('lăm'); else if (d) r.push(cs[d]); }
+    else if (d){ if (du || t) r.push('linh'); r.push(cs[d]); }
+    return r.join(' '); };
+  const g = []; let x = n; while (x > 0){ g.push(x % 1000); x = Math.floor(x / 1000); }
+  const r = []; for (let i = g.length - 1; i >= 0; i--){ if (!g[i]) continue; r.push(doc3(g[i], i < g.length - 1) + (dv[i] || '')); }
+  const s = r.join(' ').replace(/\s+/g, ' ').trim(); return s.charAt(0).toUpperCase() + s.slice(1) + ' đồng';
+}
+function plData(id, ky){
+  const nv = (D.nhanVien || []).find(n => n.id === id) || {}, thuViec = /^th(ử|u) vi(ệ|e)c$/i.test(nv.chucVu || '');
+  const cas = D.cong.filter(c => c.id === id && c.k >= ky.tu && c.k <= ky.den).sort((a, b) => a.vao - b.vao);
+  let gio = 0, base = 0, tn = 0, som = 0, mot = 0, cc = 0, tl = 0, tam = 0, ot = 0;
+  const dong = cas.map(c => { const het = c.ra || gioRaTam(c), phut = c.ra && c.phutL != null ? c.phutL : het ? gioLuong(c, het) * 60 : 0;
+    let tien = c.tien; if (tien == null){ tam++; tien = c.luongGio ? Math.round(phut / 60 * c.luongGio) : 0; }
+    const t = thuViec ? 0 : Math.round(phut / 60 * (c.tnG || 0)), s0 = !thuViec && c.som && tien > 0 ? PHU_CAP.som : 0, m0 = !thuViec && c.mot && tien > 0 ? PHU_CAP.mot : 0;
+    gio += phut / 60; tn += t; som += s0 ? 1 : 0; mot += m0 ? 1 : 0; base += tien - t - s0 - m0; cc += c.cc || 0; tl += c.tl || 0; ot += c.otTinh || 0;
+    return {c, het, phut, tien, s0, ccT:c.cc || 0, tl:c.tl || 0}; });
+  const tp = (D.thuongPhat || []).filter(x => x.id === id && x.k >= ky.tu && x.k <= ky.den).sort((a, b) => a.k < b.k ? -1 : 1);
+  const thu = [], tru = [];
+  if (thuViec) thu.push(['Lương thử việc', 'Khoán theo ngày làm', cas.length + ' ngày', PHU_CAP.thuViec || 100000, base]);
+  else thu.push(['Lương theo giờ công', 'Căn bản × giờ tính công (trong ca + OT được trả)', gio.toLocaleString('vi-VN', {maximumFractionDigits:2}) + ' giờ', nv.luong || null, base]);
+  if (tn) thu.push(['Phụ cấp thâm niên', 'Theo bậc · tính trên giờ công', gio.toLocaleString('vi-VN', {maximumFractionDigits:2}) + ' giờ', gio ? tn / gio : null, tn]);
+  if (som) thu.push(['Phụ cấp dậy sớm', 'Check-in đúng giờ mở ca', som + ' ca', PHU_CAP.som, som * PHU_CAP.som]);
+  if (mot) thu.push(['Phụ cấp ca 1 người', 'Chủ quán duyệt', mot + ' ca', PHU_CAP.mot, mot * PHU_CAP.mot]);
+  if (cc) thu.push(['Thưởng chuyên cần', 'Đạt chuỗi ca đúng giờ', Math.round(cc / 50000) + ' lần', 50000, cc]);
+  if (tl) thu.push(['Thưởng số ly theo ngày', 'Ngày quán đạt mốc 40 / 50 / 60 ly', dong.filter(d => d.tl).length + ' ngày', null, tl]);
+  tp.forEach(x => { const dc = /^Điều chỉnh:/i.test(x.lyDo || ''), ly = (x.lyDo || '').replace(/^Điều chỉnh:\s*/i, '');
+    if (x.tien >= 0 && x.loai !== 'PHAT') thu.push([dc ? 'Điều chỉnh tăng' : 'Thưởng', (ly || 'Thưởng của chủ quán') + ' · ' + dShort(x.k), '1 lần', null, x.tien]);
+    else tru.push([dc ? 'Điều chỉnh giảm' : 'Phạt / vi phạm', (ly || 'Vi phạm nội quy') + ' · ' + dShort(x.k), '1 lần', null, -x.tien]); });
+  const I = thu.reduce((a, r) => a + r[4], 0), II = tru.reduce((a, r) => a + r[4], 0);
+  const chot = (D.luongChot || []).find(x => x.id === id && x.tu === ky.tu && x.den === ky.den);
+  const k0 = D.cong.filter(c => c.id === id).map(c => c.k).sort()[0];
+  return {nv, thuViec, cas, dong, gio, ot, thu, tru, I, II, net:I - II, chot, tam, k0, ky};
+}
+function plHtml(id, ky){
+  const P = plData(id, ky), nv = P.nv, f = v => v == null ? '' : fmt(v), dd = k => k ? k.slice(8, 10) + '/' + k.slice(5, 7) + '/' + k.slice(0, 4) : '—';
+  const hm = d => d ? p2(d.getHours()) + ':' + p2(d.getMinutes()) : '—', gp = p => Math.floor(p / 60) + ':' + p2(Math.round(p % 60));
+  const tra = addDays(ky.den, 3), stt = String(nv.stt || '').replace(/\D/g, '') || '0', ma = 'KAI-' + stt.padStart(3, '0');
+  const chuTen = ((D.nhanVien || []).find(n => n.chu) || {}).ten || 'Chủ quán', now = new Date();
+  const logo = (document.querySelector('.blogo') || {}).outerHTML || '<b style="font:700 22px Barlow Condensed">KAI CAFÉ</b>';
+  const tb = (rows, rong) => rows.length ? rows.map((r, i) => `<tr><td class="c">${i + 1}</td><td><b>${esc(r[0])}</b></td><td class="dg">${esc(r[1])}</td><td class="num">${esc(r[2])}</td><td class="num">${f(r[3])}</td><td class="num"><b>${f(r[4])}</b></td></tr>`).join('') : `<tr><td class="c">—</td><td colspan="4" class="dg">${rong}</td><td class="num">0</td></tr>`;
+  const head = '<tr><th class="c" style="width:34px">STT</th><th style="width:150px">Khoản mục</th><th>Diễn giải</th><th class="num" style="width:78px">Số lượng</th><th class="num" style="width:74px">Đơn giá</th><th class="num" style="width:96px">Thành tiền</th></tr>';
+  const nt = c => { const a = []; if (c.s0) a.push('Sớm'); if (/duyệt OT/i.test(c.c.note)) a.push('OT duyệt'); if (c.ccT) a.push('CC +' + fmt(c.ccT / 1000) + 'k'); if (c.tl) a.push('Ly +' + fmt(c.tl / 1000) + 'k'); if (!c.c.ra) a.push('chưa check-out'); if (/bù công/i.test(c.c.note)) a.push('bù công'); return a.join(' · '); };
+  const st = P.chot ? '<span class="pl-st">ĐÃ CHỐT</span>' : '<span class="pl-st tam">TẠM TÍNH</span>';
+  return `<div class="pl-conf">BẢO MẬT · CONFIDENTIAL</div>
+  <div class="pl-hd">
+    <div class="pl-co">${logo}<div><b>KAI CAFÉ</b><br>Xe cà phê · 429 Phan Huy Ích<br>Bộ phận: Vận hành quầy</div></div>
+    <div class="pl-tt"><h1>PHIẾU LƯƠNG</h1><div class="en">PAYSLIP</div><span class="ky">Kỳ ${esc(ky.ten)}</span></div>
+    <div class="pl-meta"><div><span>Số phiếu</span><b>PL${ky.den.slice(0, 7).replace('-', '')}-${stt.padStart(3, '0')}</b></div><div><span>Ngày lập</span><b>${p2(now.getDate())}/${p2(now.getMonth() + 1)}/${now.getFullYear()}</b></div><div><span>Ngày trả</span><b>${dd(P.chot && P.chot.tra || tra)}</b></div><div><span>Trạng thái</span>${st}</div></div>
+  </div>
+  <div class="pl-sec">Thông tin nhân viên <i>EMPLOYEE</i></div>
+  <table class="pl-info"><tr><td class="k">Họ và tên</td><td class="v">${esc(nv.ten || '')}</td><td class="k">Kỳ lương</td><td class="v">${dd(ky.tu)} – ${dd(ky.den)}</td></tr>
+    <tr><td class="k">Mã nhân viên</td><td class="v">${ma}</td><td class="k">Số ca làm</td><td class="v">${P.cas.length} ca</td></tr>
+    <tr><td class="k">Chức danh</td><td class="v">${esc(nv.chucVu || 'Nhân viên')} · pha chế</td><td class="k">Giờ tính công</td><td class="v">${P.gio.toLocaleString('vi-VN', {maximumFractionDigits:2})} giờ${P.ot ? ' (OT ' + fmt(P.ot) + ' phút)' : ''}</td></tr>
+    <tr><td class="k">Bậc</td><td class="v">${esc(nv.bac || '—')}</td><td class="k">Lương nền / giờ</td><td class="v">${P.thuViec ? 'Thử việc · khoán ngày' : f(nv.luong) + ' đ'}</td></tr>
+    <tr><td class="k">Ngày vào làm</td><td class="v">${dd(P.k0)}</td><td class="k">Hình thức trả</td><td class="v">Chuyển khoản / tiền mặt</td></tr></table>
+  <div class="pl-sec">I. Thu nhập <i>EARNINGS</i></div>
+  <table class="pl-tb">${head}${tb(P.thu, 'Không có ca làm trong kỳ')}<tr class="tong"><td></td><td colspan="4">Tổng thu nhập (I)</td><td class="num">${fmt(P.I)}</td></tr></table>
+  <div class="pl-sec">II. Khấu trừ <i>DEDUCTIONS</i></div>
+  <table class="pl-tb">${head}${tb(P.tru, 'Không có khoản khấu trừ trong kỳ')}<tr class="tong"><td></td><td colspan="4">Tổng khấu trừ (II)</td><td class="num">${P.II ? '−' + fmt(P.II) : '0'}</td></tr></table>
+  <div class="pl-net"><div class="l">Thực lĩnh (I − II)<small>Net pay · số tiền nhận trong kỳ</small></div><div class="v">${fmt(P.net)}<span>VNĐ</span></div></div>
+  <div class="pl-chu">Bằng chữ: <b>${plDocSo(P.net)}</b>.</div>
+  <div class="pl-sec">III. Bảng chấm công chi tiết <i>ATTENDANCE</i></div>
+  <table class="pl-cc"><tr><th class="c">#</th><th>Ngày</th><th class="c">Thứ</th><th class="c">Vào</th><th class="c">Ra</th><th class="num">Giờ công</th><th class="num">OT (phút)</th><th>Ghi chú</th><th class="num">Tiền công</th></tr>
+    ${P.dong.map((d, i) => `<tr><td class="c">${i + 1}</td><td>${dShort(d.c.k)}</td><td class="c">${THU[fromKey(d.c.k).getDay()]}</td><td class="c">${hm(d.c.vao)}</td><td class="c">${d.c.ra ? hm(d.c.ra) : '—'}</td><td class="num">${gp(d.phut)}</td><td class="num">${d.c.otTinh || ''}</td><td>${esc(nt(d))}</td><td class="num">${fmt(d.tien + d.ccT + d.tl)}</td></tr>`).join('')}
+    <tr class="tong"><td></td><td colspan="4">Cộng ${P.cas.length} ca</td><td class="num">${gp(P.gio * 60)}</td><td class="num">${fmt(P.ot)}</td><td></td><td class="num">${fmt(P.dong.reduce((a, d) => a + d.tien + d.ccT + d.tl, 0))}</td></tr></table>
+  <p class="pl-nt"><b>Ghi chú:</b> Giờ tính công = giờ trong ca + phút vào sớm (tối đa 30 phút/ca) + OT chủ quán duyệt; về muộn không duyệt không tính. Tiền công từng ca gồm căn bản, thâm niên và phụ cấp; cột tiền công đã cộng thưởng chuyên cần (CC) và thưởng ly của ca đó.${P.tam ? ' Có ' + P.tam + ' ca chưa check-out đang tính tạm tới giờ ra dự kiến.' : ''}${P.chot && Math.abs((P.chot.thuc || 0) - P.net) > 1 && P.chot.thuc ? ' <b>Số lúc chốt: ' + fmt(P.chot.thuc) + ' đ.</b>' : ''} Thắc mắc về phiếu lương vui lòng phản hồi chủ quán trong <b>03 ngày</b> kể từ ngày nhận.</p>
+  <div class="pl-ky"><div><b>Người lập phiếu</b><i>(Ký, ghi rõ họ tên)</i>Kai Bot · hệ thống</div><div><b>Chủ quán duyệt</b><i>(Ký, ghi rõ họ tên)</i>${esc(chuTen)}</div><div><b>Người nhận lương</b><i>(Ký, ghi rõ họ tên)</i>${esc(nv.ten || '')}</div></div>
+  <div class="pl-ft"><span>Kai Café · Phiếu lương nội bộ · ${ma}</span><span>Số liệu tự động từ chấm công bot · Dashboard ${BAN_DASH} · in ${hm(now)} ${p2(now.getDate())}/${p2(now.getMonth() + 1)}/${now.getFullYear()}</span></div>`;
+}
+function plNguoi(){
+  if (VAI === 'nhanvien'){ const id = nvToiId(); const n = (D.nhanVien || []).find(x => x.id === id); return n ? [n] : []; }
+  const coCa = new Set(D.cong.map(c => c.id));
+  return (D.nhanVien || []).filter(n => !n.chu && coCa.has(n.id)).sort((a, b) => (a.cu ? 1 : 0) - (b.cu ? 1 : 0) || String(a.ten).localeCompare(String(b.ten), 'vi'));
+}
+function plDoChon(nvSel, kySel, id, kyTu){
+  const ds = plNguoi(); if (!ds.some(n => n.id === id)) id = ds[0] && ds[0].id;
+  nvSel.innerHTML = ds.map(n => `<option value="${esc(n.id)}"${n.id === id ? ' selected' : ''}>${esc(n.ten)}${n.cu ? ' (cũ)' : ''}</option>`).join('');
+  const ks = id ? plKyList(id) : []; if (!ks.some(k => k.tu === kyTu)) kyTu = ks[0] && ks[0].tu;
+  kySel.innerHTML = ks.map(k => `<option value="${k.tu}|${k.den}"${k.tu === kyTu ? ' selected' : ''}>Kỳ ${esc(k.ten)}</option>`).join('');
+  return {id, ky:ks.find(k => k.tu === kyTu)};
+}
+const PL = {id:null, tu:null};
+function renderPLCard(){
+  const a = $('plNv'), b = $('plKy'); if (!a || !D || !D.cong) return;
+  const r = plDoChon(a, b, PL.id, PL.tu); PL.id = r.id; PL.tu = r.ky && r.ky.tu;
+  $('sec-hr-pl').hidden = !r.id;
+  if (!a.dataset.on){ a.dataset.on = 1;
+    a.onchange = () => { PL.id = a.value; PL.tu = null; renderPLCard(); };
+    b.onchange = () => { PL.tu = b.value.split('|')[0]; };
+    $('plMo').onclick = () => plMo();
+    $('plNv2').onchange = () => { PL.id = $('plNv2').value; PL.tu = null; plVe(); };
+    $('plKy2').onchange = () => { PL.tu = $('plKy2').value.split('|')[0]; plVe(); };
+    $('plDong').onclick = () => { $('plWrap').hidden = true; document.documentElement.classList.remove('plIn'); renderPLCard(); };
+    $('plIn').onclick = () => window.print();
+    addEventListener('resize', plCo); }
+}
+function plCo(){ const el = $('plTo'); if (el && !$('plWrap').hidden) el.style.zoom = Math.min(1, (innerWidth - 16) / 794).toFixed(3); }
+function plVe(){
+  const r = plDoChon($('plNv2'), $('plKy2'), PL.id, PL.tu); PL.id = r.id; PL.tu = r.ky && r.ky.tu;
+  $('plTo').innerHTML = r.ky ? plHtml(r.id, r.ky) : '<p style="padding:40px">Chưa có ca làm để lập phiếu.</p>';
+  document.title = 'Phieu luong ' + ((D.nhanVien || []).find(n => n.id === r.id) || {ten:''}).ten + ' ' + (r.ky ? r.ky.den.slice(0, 7) : '');
+}
+function plMo(){ $('plWrap').hidden = false; document.documentElement.classList.add('plIn'); plVe(); plCo(); }
+addEventListener('afterprint', () => { if (document.title.startsWith('Phieu luong')) document.title = 'Kai Café'; });
 function renderHr(){
+  try { renderPLCard(); } catch(e){ console.warn(e); }
   try { renderNhatKy(); } catch(e){ console.warn(e); }
   renderHoSo();
   renderAiLam();
@@ -7609,5 +7803,6 @@ function khoiTaoDiDong(){
 })();
 </script>
 
+<div id="plWrap" hidden role="dialog" aria-label="Phiếu lương"><div class="pl-bar"><b>Phiếu lương</b><select id="plNv2" aria-label="Nhân viên"></select><select id="plKy2" aria-label="Kỳ lương"></select><button class="in" id="plIn" type="button">🖨 In / Lưu PDF</button><button id="plDong" type="button">✕ Đóng</button></div><div class="pl-stage"><div class="pl" id="plTo"></div></div></div>
 </body>
 </html>
