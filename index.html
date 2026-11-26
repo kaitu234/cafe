@@ -6159,7 +6159,7 @@ async function plPng(){
   try { await plTaiH2C(); if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const cv = await html2canvas(cl, {scale:2, backgroundColor:'#ffffff', useCORS:true, logging:false, windowWidth:900});
     const blob = await new Promise(r => cv.toBlob(r, 'image/png')); PL.blob = blob; const url = URL.createObjectURL(blob);
-    img.src = url; tai.href = url; tai.download = document.title.replace(/[^p{L}d -]/gu, '').trim().replace(/ +/g, '-') + '.png';
+    img.src = url; tai.href = url; tai.download = document.title.replace(/[\\/:*?"<>|]/g, '').trim().replace(/ +/g, '-') + '.png';
     nt.textContent = 'Ảnh phiếu lương · bấm Copy ảnh rồi dán, hoặc tải file PNG';
   } catch(e){ nt.textContent = '⚠ Không tạo được ảnh: ' + e.message; } finally { box.remove(); }
 }
