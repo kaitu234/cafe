@@ -6142,13 +6142,6 @@ function renderPLCard(){
     a.onchange = () => { PL.id = a.value; PL.tu = null; renderPLCard(); };
     b.onchange = () => { PL.tu = b.value.split('|')[0]; };
     $('plMo').onclick = () => plMo();
-    $('plNv2').onchange = () => { PL.id = $('plNv2').value; PL.tu = null; plVe(); };
-    $('plKy2').onchange = () => { PL.tu = $('plKy2').value.split('|')[0]; plVe(); };
-    $('plDong').onclick = () => { $('plWrap').hidden = true; document.documentElement.classList.remove('plIn'); renderPLCard(); };
-    $('plIn').onclick = () => window.print();
-    $('plPng').onclick = () => plPng();
-    $('plAnhDong').onclick = () => { $('plAnh').hidden = true; };
-    $('plAnhCopy').onclick = async () => { try { await navigator.clipboard.write([new ClipboardItem({'image/png': PL.blob})]); $('plAnhNt').textContent = '✔ Đã copy ảnh — dán (Ctrl+V) vào Zalo / Telegram'; } catch(e){ $('plAnhNt').textContent = 'Trình duyệt không cho copy tự động — nhấn chuột phải (hoặc giữ tay trên điện thoại) vào ảnh → Sao chép hình ảnh'; } };
     addEventListener('resize', plCo); }
 }
 /* v1.7.360 (chủ 26/11): xuất phiếu ra ảnh PNG (html2canvas tải khi cần, cdnjs) — xem ảnh, Copy ảnh vào clipboard hoặc tải file */
@@ -6159,7 +6152,7 @@ async function plPng(){
   try { await plTaiH2C(); if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const cv = await html2canvas(cl, {scale:2, backgroundColor:'#ffffff', useCORS:true, logging:false, windowWidth:900});
     const blob = await new Promise(r => cv.toBlob(r, 'image/png')); PL.blob = blob; const url = URL.createObjectURL(blob);
-    img.src = url; tai.href = url; tai.download = document.title.replace(/[\\/:*?"<>|]/g, '').trim().replace(/ +/g, '-') + '.png';
+    img.src = url; tai.href = url; tai.download = ('Phieu luong ' + ((D.nhanVien || []).find(n => n.id === PL.id) || {ten:''}).ten + ' ' + String(PL.tu || '').slice(0, 7)).replace(/[\\/:*?"<>|]/g, '').trim().replace(/ +/g, '-') + '.png';
     nt.textContent = 'Ảnh phiếu lương · bấm Copy ảnh rồi dán, hoặc tải file PNG';
   } catch(e){ nt.textContent = '⚠ Không tạo được ảnh: ' + e.message; } finally { box.remove(); }
 }
@@ -6169,7 +6162,17 @@ function plVe(){
   $('plTo').innerHTML = r.ky ? plHtml(r.id, r.ky) : '<p style="padding:40px">Chưa có ca làm để lập phiếu.</p>';
   document.title = 'Phieu luong ' + ((D.nhanVien || []).find(n => n.id === r.id) || {ten:''}).ten + ' ' + (r.ky ? r.ky.den.slice(0, 7) : '');
 }
-function plMo(){ $('plWrap').hidden = false; document.documentElement.classList.add('plIn'); plVe(); plCo(); }
+/* v1.7.360: gắn nút khung phiếu lúc mở (khung nằm cuối trang, lần render đầu có thể chưa có trong DOM) */
+function plGan(){ if ($('plWrap').dataset.on) return; $('plWrap').dataset.on = 1;
+    $('plNv2').onchange = () => { PL.id = $('plNv2').value; PL.tu = null; plVe(); };
+    $('plKy2').onchange = () => { PL.tu = $('plKy2').value.split('|')[0]; plVe(); };
+    $('plDong').onclick = () => { $('plWrap').hidden = true; document.documentElement.classList.remove('plIn'); renderPLCard(); };
+    $('plIn').onclick = () => window.print();
+    $('plPng').onclick = () => plPng();
+    $('plAnhDong').onclick = () => { $('plAnh').hidden = true; };
+    $('plAnhCopy').onclick = async () => { try { await navigator.clipboard.write([new ClipboardItem({'image/png': PL.blob})]); $('plAnhNt').textContent = '✔ Đã copy ảnh — dán (Ctrl+V) vào Zalo / Telegram'; } catch(e){ $('plAnhNt').textContent = 'Trình duyệt không cho copy tự động — nhấn chuột phải (hoặc giữ tay trên điện thoại) vào ảnh → Sao chép hình ảnh'; } };
+}
+function plMo(){ plGan(); $('plWrap').hidden = false; document.documentElement.classList.add('plIn'); plVe(); plCo(); }
 addEventListener('afterprint', () => { if (document.title.startsWith('Phieu luong')) document.title = 'Kai Café'; });
 function renderHr(){
   try { renderPLCard(); } catch(e){ console.warn(e); }
