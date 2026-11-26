@@ -762,13 +762,16 @@ button,a,.presets button,.jnav a{touch-action:manipulation;-webkit-tap-highlight
 .pl-cc tr{break-inside:avoid}
 .pl-ft{margin-top:14px;padding-top:6px;border-top:1px solid #cbb79c;display:flex;justify-content:space-between;font-size:9px;color:#8a6b55}
 @media print{
-  @page{size:A4;margin:0}
+  @page{size:A4;margin:9mm 11mm}
   html.plIn body>*:not(#plWrap){display:none!important}
   html.plIn,html.plIn body{background:#fff!important}
   html.plIn #plWrap{position:static;background:none;padding:0;overflow:visible}
   html.plIn .pl-bar{display:none!important}
+  html.plIn .pl-conf{right:0;top:16px}
+  html.plIn .pl-sec.pl-pl{break-before:page;margin-top:0}
+  html.plIn .pl-ft{margin-top:14px!important}
   html.plIn .pl-stage{padding:0;display:block}
-  html.plIn .pl{box-shadow:none;zoom:1!important;width:210mm;min-height:297mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html.plIn .pl{box-shadow:none;zoom:1!important;width:auto;min-height:0;padding:16px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 
 /* ---------- in ---------- */
